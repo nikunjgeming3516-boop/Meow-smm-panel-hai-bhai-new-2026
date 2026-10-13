@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Dashboard — NexBoost</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E👑%3C/text%3E%3C/svg%3E"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#07080f;--bg2:#0a0c14;--card:#12141f;--card2:#171a28;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--text:#eceef7;--muted:#888fa8;--dim:#5a5f7a;--gold:#f5b74c;--gold2:#ffd97a;--purple:#8b5cf6;--purple2:#c084fc;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--blue:#3b82f6;--grad-gold:linear-gradient(135deg,#f5b74c 0%,#ffd97a 50%,#f59e0b 100%)}
+html,body{height:100%}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button,input,select,textarea{font-family:inherit;font-size:inherit;outline:none;border:none}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#232838;border-radius:10px}
+.hidden{display:none!important}
+
+.app{display:flex;min-height:100vh}
+.sidebar{width:250px;background:var(--bg2);border-right:1px solid var(--border);position:fixed;height:100vh;padding:20px 14px;display:flex;flex-direction:column;z-index:60;transition:transform .3s}
+.sb-brand{display:flex;align-items:center;gap:11px;padding:0 8px 22px;border-bottom:1px solid var(--border)}
+.sb-logo{width:38px;height:38px;border-radius:11px;background:var(--grad-gold);display:grid;place-items:center;font-size:18px;box-shadow:0 8px 20px rgba(245,183,76,.3)}
+.sb-brand h2{font-size:16px;font-weight:800;letter-spacing:-.3px}
+.sb-brand h2 span{background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sb-nav{flex:1;overflow-y:auto;padding:14px 0}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:.18s;margin-bottom:2px}
+.nav-item svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.nav-item.active{background:linear-gradient(90deg,rgba(245,183,76,.16),rgba(245,183,76,.02));color:var(--gold)}
+.sb-bottom{margin-top:auto;padding-top:14px;border-top:1px solid var(--border)}
+.user-chip{display:flex;align-items:center;gap:10px;padding:10px;border-radius:11px;background:var(--card);border:1px solid var(--border);margin-bottom:9px}
+.avatar{width:34px;height:34px;border-radius:9px;background:var(--grad-gold);display:grid;place-items:center;font-weight:800;font-size:13px;color:#1a1200;flex-shrink:0}
+.uci{overflow:hidden}
+.uci b{font-size:12.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uci span{font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.logout{width:100%;padding:10px;border-radius:10px;background:rgba(239,68,68,.1);color:#f87171;font-weight:600;font-size:13px;cursor:pointer;transition:.2s;border:1px solid rgba(239,68,68,.2)}
+.logout:hover{background:rgba(239,68,68,.2)}
+
+.main{flex:1;margin-left:250px;display:flex;flex-direction:column;min-width:0}
+.topbar{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;border-bottom:1px solid var(--border);background:rgba(10,12,20,.85);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50}
+.topbar h1{font-size:17px;font-weight:800;letter-spacing:-.3px}
+.topbar p{font-size:12px;color:var(--muted);margin-top:2px}
+.tb-right{display:flex;align-items:center;gap:12px}
+.bal-pill{display:flex;align-items:center;gap:8px;padding:9px 15px;border-radius:11px;background:var(--card);border:1px solid rgba(245,183,76,.25);font-weight:800;font-size:14px;color:var(--gold)}
+.menu-btn{display:none;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px;cursor:pointer}
+.menu-btn svg{width:18px;height:18px;stroke:var(--text);display:block;fill:none;stroke-width:2}
+
+.content{padding:24px;flex:1}
+.page{display:none}.page.active{display:block;animation:fade .35s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.page-head{margin-bottom:22px}
+.page-head h1{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.page-head p{font-size:13px;color:var(--muted);margin-top:5px}
+
+.btn{padding:11px 18px;border-radius:11px;font-weight:700;font-size:13px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.btn-gold{background:var(--grad-gold);color:#1a1200;box-shadow:0 8px 20px rgba(245,183,76,.28)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(245,183,76,.42)}
+.btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--border2)}
+.btn-ghost:hover{border-color:var(--gold)}
+.btn-block{width:100%}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none!important}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px;margin-bottom:22px}
+.stat{background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:16px;padding:20px;position:relative;overflow:hidden;transition:.25s}
+.stat:hover{transform:translateY(-3px);border-color:rgba(245,183,76,.28)}
+.stat .ic{width:40px;height:40px;border-radius:12px;background:rgba(245,183,76,.1);border:1px solid rgba(245,183,76,.22);display:grid;place-items:center;margin-bottom:14px}
+.stat .ic svg{width:19px;height:19px;stroke:var(--gold);fill:none;stroke-width:2}
+.stat .lbl{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:5px}
+.stat .val{font-size:24px;font-weight:800;letter-spacing:-.6px}
+.stat .val.green{color:#4ade80}
+.stat .val.gold{color:var(--gold)}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:18px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.card-head h2{font-size:15.5px;font-weight:800;display:flex;align-items:center;gap:9px}
+.card-head h2 svg{width:17px;height:17px;stroke:var(--gold);fill:none;stroke-width:2}
+
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}
+.form-group{display:flex;flex-direction:column;gap:7px}
+.form-group label{font-size:12px;font-weight:700;color:var(--muted)}
+.form-group input,.form-group select,.form-group textarea{padding:12px 13px;background:rgba(7,8,15,.6);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13.5px;transition:.2s;width:100%}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,183,76,.1)}
+.form-group select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888fa8' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center}
+.form-group select option{background:#12141f}
+.form-group textarea{min-height:80px;resize:vertical;font-family:inherit}
+.full{grid-column:1/-1}
+
+.charge-box{display:flex;justify-content:space-between;align-items:center;padding:15px 18px;border-radius:12px;background:linear-gradient(135deg,rgba(245,183,76,.13),rgba(139,92,246,.06));border:1px solid rgba(245,183,76,.28);margin-top:6px}
+.charge-box .cl{font-size:13px;color:var(--muted);font-weight:600}
+.charge-box .cv{font-size:23px;font-weight:800;background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+.tbl-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+thead{background:rgba(7,8,15,.6)}
+th{text-align:left;padding:12px 15px;font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:.7px;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:13px 15px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(245,183,76,.03)}
+.rate{color:#4ade80;font-weight:700}
+.mono{font-family:'SF Mono',Consolas,monospace;font-size:11.5px;color:var(--muted)}
+
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:10.5px;font-weight:800;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+.b-pending{background:rgba(245,158,11,.13);color:#fbbf24}
+.b-progress{background:rgba(59,130,246,.13);color:#60a5fa}
+.b-completed{background:rgba(34,197,94,.13);color:#4ade80}
+.b-cancelled{background:rgba(239,68,68,.13);color:#f87171}
+.b-partial{background:rgba(139,92,246,.13);color:#c084fc}
+
+.empty{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty svg{width:44px;height:44px;stroke:#333a52;margin-bottom:12px;fill:none;stroke-width:1.5}
+.empty p{font-size:13.5px}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{padding:7px 14px;border-radius:20px;background:var(--card2);border:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:.2s}
+.chip:hover{border-color:var(--border2);color:var(--text)}
+.chip.active{background:var(--grad-gold);color:#1a1200;border-color:transparent}
+
+.toast-wrap{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+.toast{display:flex;align-items:center;gap:11px;padding:14px 18px;border-radius:13px;background:rgba(18,20,31,.97);border:1px solid var(--border2);backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);font-size:13.5px;font-weight:600;animation:slideIn .35s;min-width:250px;max-width:340px}
+@keyframes slideIn{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+.toast.out{animation:slideOut .3s forwards}
+@keyframes slideOut{to{opacity:0;transform:translateX(60px)}}
+.toast .ti{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;flex-shrink:0;font-weight:800}
+.toast.ok .ti{background:rgba(34,197,94,.18);color:#4ade80}
+.toast.err .ti{background:rgba(239,68,68,.18);color:#f87171}
+.toast.info .ti{background:rgba(245,183,76,.18);color:var(--gold)}
+
+.modal-bg{position:fixed;inset:0;background:rgba(4,5,10,.8);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px}
+.modal-bg.show{display:flex;animation:fade .25s}
+.modal{background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--border2);border-radius:20px;padding:28px;max-width:460px;width:100%;animation:rise .3s;max-height:90vh;overflow-y:auto}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal h3{font-size:18px;font-weight:800;margin-bottom:8px}
+.modal p{font-size:13.5px;color:var(--muted);line-height:1.65;margin-bottom:20px}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+.modal-actions .btn{flex:1}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:55;display:none}
+.overlay.show{display:block}
+
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.menu-btn{display:block}
+  .content{padding:16px}.topbar{padding:0 16px}
+  .stats{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:11px}.stat{padding:15px}.stat .val{font-size:19px}
+  .toast-wrap{left:14px;right:14px;bottom:14px}.toast{max-width:none}
+}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">👑</div>
+      <h2>Nex<span>Boost</span></h2>
+    </div>
+    <nav class="sb-nav" id="sbNav"></nav>
+    <div class="sb-bottom">
+      <div class="user-chip">
+        <div class="avatar" id="sbAvatar">U</div>
+        <div class="uci"><b id="sbName">User</b><span id="sbEmail">user@mail.com</span></div>
+      </div>
+      <button class="logout" onclick="confirmLogout()">Logout</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:14px">
+        <button class="menu-btn" onclick="toggleSidebar()">
+          <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div><h1 id="pageTitle">Dashboard</h1><p id="pageSub">Overview</p></div>
+      </div>
+      <div class="tb-right">
+        <div class="bal-pill">💰 <span id="topBalance">₹0.00</span></div>
+      </div>
+    </header>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">Confirm</h3>
+    <p id="modalText">Are you sure?</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" id="modalConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+/* =====================================================
+   USER DASHBOARD
+   ===================================================== */
+let USER = NX.currentUser();
+if (!USER) window.location.href = 'index.html';
+
+const PAGES = [
+  {id:'home', label:'Dashboard', icon:'grid'},
+  {id:'new', label:'New Order', icon:'plus'},
+  {id:'services', label:'All Services', icon:'box'},
+  {id:'orders', label:'My Orders', icon:'shopping'},
+  {id:'funds', label:'Add Funds', icon:'wallet'},
+  {id:'tickets', label:'Support', icon:'message'},
+  {id:'profile', label:'Profile', icon:'user'},
+];
+const ICONS = {
+  grid:'<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',
+  plus:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>',
+  box:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>',
+  shopping:'<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>',
+  wallet:'<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>',
+  message:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  check:'<polyline points="20 6 9 17 4 12"/>',
+};
+const icon = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]||ICONS.grid}</svg>`;
+const $ = id => document.getElementById(id);
+
+function toast(msg, type='info'){
+  const i = {ok:'✓',err:'✕',info:'i'};
+  const el = document.createElement('div');
+  el.className = 'toast '+type;
+  el.innerHTML = `<div class="ti">${i[type]}</div><div>${msg}</div>`;
+  $('toastWrap').appendChild(el);
+  setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),300)},3000);
+}
+let modalCb=null;
+function openModal(t,x,cb){$('modalTitle').textContent=t;$('modalText').innerHTML=x;$('modalBg').classList.add('show');modalCb=cb}
+function closeModal(){$('modalBg').classList.remove('show');modalCb=null}
+$('modalConfirm').onclick=()=>{if(modalCb)modalCb();closeModal()};
+$('modalBg').onclick=e=>{if(e.target.id==='modalBg')closeModal()};
+
+function toggleSidebar(){$('sidebar').classList.toggle('open');$('overlay').classList.toggle('show')}
+function closeSidebar(){$('sidebar').classList.remove('open');$('overlay').classList.remove('show')}
+
+function renderSidebar(){
+  $('sbNav').innerHTML = PAGES.map(p=>`<div class="nav-item" data-page="${p.id}" onclick="go('${p.id}')">${icon(p.icon)}<span>${p.label}</span></div>`).join('');
+}
+
+function refreshUser(){
+  USER = NX.currentUser();
+  if (!USER){ window.location.href='index.html'; return; }
+  $('sbAvatar').textContent = USER.name.charAt(0).toUpperCase();
+  $('sbName').textContent = USER.name;
+  $('sbEmail').textContent = USER.email;
+  $('topBalance').textContent = NX.money(USER.balance);
+}
+
+const META = {
+  home:['Dashboard','Overview'], new:['New Order','Place a new order'],
+  services:['All Services','Rates & availability'], orders:['My Orders','Track your orders'],
+  funds:['Add Funds','Wallet top-up'], tickets:['Support','Raise a ticket'],
+  profile:['Profile','Account settings']
+};
+function go(page){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
+  $('pageTitle').textContent = META[page][0];
+  $('pageSub').textContent = META[page][1];
+  closeSidebar();
+  const r = {home:renderHome,new:renderNew,services:renderServices,orders:()=>renderOrders('all'),funds:renderFunds,tickets:renderTickets,profile:renderProfile};
+  if (r[page]) r[page]();
+}
+
+/* ---------- HOME ---------- */
+function renderHome(){
+  const orders = NX.load().orders.filter(o=>o.userId===USER.id);
+  const completed = orders.filter(o=>o.status==='Completed').length;
+  const pending = orders.filter(o=>o.status==='Pending'||o.status==='In Progress').length;
+  const recent = orders.slice(0,5);
+
+  $('content').innerHTML = `
+    <div class="page active">
+      <div class="page-head"><h1>Welcome back, ${USER.name.split(' ')[0]}! 👋</h1><p>Yahan aapka pura account overview hai</p></div>
+      <div class="stats">
+        <div class="stat"><div class="ic">${icon('wallet')}</div><div class="lbl">Balance</div><div class="val gold">${NX.money(USER.balance)}</div></div>
+        <div class="stat"><div class="ic">${icon('shopping')}</div><div class="lbl">Total Orders</div><div class="val">${orders.length}</div></div>
+        <div class="stat"><div class="ic">${icon('clock')}</div><div class="lbl">Pending</div><div class="val">${pending}</div></div>
+        <div class="stat"><div class="ic">${icon('check')}</div><div class="lbl">Completed</div><div class="val green">${completed}</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>${icon('clock')} Recent Orders</h2><button class="btn btn-gold" onclick="go('new')">+ New Order</button></div>
+        ${recent.length ? `
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Order ID</th><th>Service</th><th>Qty</th><th>Charge</th><th>Status</th></tr></thead>
+          <tbody>${recent.map(o=>`
+            <tr><td class="mono" style="color:var(--gold);font-weight:700">${o.id}</td><td>${o.service}</td><td>${o.qty.toLocaleString()}</td><td class="rate">${NX.money(o.charge)}</td><td>${badge(o.status)}</td></tr>
+          `).join('')}</tbody>
+        </table></div>` : `<div class="empty">${icon('shopping')}<p>No orders yet. Start your first order!</p></div>`}
+      </div>
+    </div>`;
+}
+
+/* ---------- NEW ORDER ---------- */
+function renderNew(){
+  const db = NX.load();
+  const cats = [...new Set(db.services.filter(s=>s.status==='Active').map(s=>s.cat))];
+  $('content').innerHTML = `
+    <div class="page active">
+      <div class="page-head"><h1>Place New Order</h1><p>Select service, add link and quantity</p></div>
+      <div class="card" style="max-width:820px">
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="form-group"><label>Category</label><select id="ordCat" onchange="fillServices()">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
+          <div class="form-group"><label>Service</label><select id="ordSvc" onchange="calcCharge()"></select></div>
+          <div class="form-group"><label>Link / Username</label><input type="text" id="ordLink" placeholder="https://instagram.com/username"/></div>
+          <div class="form-group"><label>Quantity <span id="qRange" style="color:#5a5f7a;font-weight:400"></span></label><input type="number" id="ordQty" placeholder="Enter quantity" oninput="calcCharge()"/></div>
+          <div class="charge-box"><span class="cl">Total Charge</span><span class="cv" id="ordCharge">₹0.00</span></div>
+          <div class="charge-box" style="background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(245,183,76,.06));border-color:rgba(34,197,94,.28)"><span class="cl">Your Balance</span><span class="cv" style="background:none;color:#4ade80;-webkit-text-fill-color:#4ade80">${NX.money(USER.balance)}</span></div>
+          <div class="alert alert-err" id="orderAlert" style="display:none"></div>
+          <button class="btn btn-gold btn-block" onclick="placeOrder()">Submit Order</button>
+        </div>
+      </div>
+    </div>`;
+  fillServices();
+}
+function fillServices(){
+  const db = NX.load();
+  const cat = $('ordCat').value;
+  const list = db.services.filter(s=>s.cat===cat && s.status==='Active');
+  $('ordSvc').innerHTML = list.map(s=>`<option value="${s.id}">${s.name} — ${NX.money(s.rate)}/1000</option>`).join('');
+  calcCharge();
+}
+function calcCharge(){
+  const db = NX.load();
+  const svc = db.services.find(s=>s.id===Number($('ordSvc').value));
+  if (!svc) return;
+  const qty = Number($('ordQty').value)||0;
+  const charge = (qty/1000)*svc.rate;
+  $('ordCharge').textContent = NX.money(charge);
+  $('qRange').textContent = `(min ${svc.min.toLocaleString()} — max ${svc.max.toLocaleString()})`;
+  $('ordQty').min = svc.min; $('ordQty').max = svc.max;
+}
+function placeOrder(){
+  const alert = $('orderAlert'); alert.style.display = 'none';
+  const svcId = Number($('ordSvc').value);
+  const link = $('ordLink').value.trim();
+  const qty = Number($('ordQty').value);
+  const r = NX.createOrder(USER.id, svcId, link, qty);
+  if (!r.ok){ alert.textContent = r.msg; alert.style.display = 'block'; return; }
+  toast(`Order ${r.order.id} placed successfully! ✅`,'ok');
+  refreshUser();
+  go('orders');
+}
+
+/* ---------- SERVICES ---------- */
+function renderServices(){
+  const db = NX.load();
+  const cats = ['All',...new Set(db.services.map(s=>s.cat))];
+  const list = db.services.filter(s=>s.status==='Active');
+  $('content').innerHTML = `
+    <div class="page active">
+      <div class="page-head"><h1>All Services</h1><p>Complete rate list</p></div>
+      <div class="card">
+        <div class="chips">${cats.map((c,i)=>`<div class="chip ${i===0?'active':''}" onclick="filterSvc(this,'${c}')">${c}</div>`).join('')}</div>
+        <div id="svcTbl">${svcTable(list)}</div>
+      </div>
+    </div>`;
+}
+function filterSvc(el,cat){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  const list = NX.load().services.filter(s=>s.status==='Active'&&(cat==='All'||s.cat===cat));
+  $('svcTbl').innerHTML = svcTable(list);
+}
+function svcTable(list){
+  return `<div class="tbl-wrap"><table>
+    <thead><tr><th>ID</th><th>Service</th><th>Category</th><th>Rate/1000</th><th>Min/Max</th><th>Speed</th><th></th></tr></thead>
+    <tbody>${list.map(s=>`
+      <tr><td class="mono">#${s.id}</td><td style="font-weight:600">${s.name}</td><td><span class="badge b-progress">${s.cat}</span></td><td class="rate">${NX.money(s.rate)}</td><td class="mono">${s.min.toLocaleString()}/${s.max.toLocaleString()}</td><td class="mono">${s.speed||'—'}</td><td><button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" onclick="orderThis(${s.id})">Order</button></td></tr>
+    `).join('')}</tbody>
+  </table></div>`;
+}
+function orderThis(id){
+  go('new');
+  const db = NX.load();
+  const s = db.services.find(x=>x.id===id);
+  setTimeout(()=>{ $('ordCat').value=s.cat; fillServices(); $('ordSvc').value=s.id; calcCharge(); $('ordLink').focus(); },100);
+}
+
+/* ---------- ORDERS ---------- */
+function renderOrders(filter){
+  const orders = NX.load().orders.filter(o=>o.userId===USER.id);
+  const filtered = filter==='all'?orders:orders.filter(o=>o.status===filter);
+  $('content').innerHTML = `
+    <div class="page active">
+      <div class="page-head"><h1>My Orders</h1><p>${orders.length} total orders</p></div>
+      <div class="card">
+        <div class="chips">
+          ${['all','Pending','In Progress','Completed','Cancelled'].map(f=>`<div class="chip ${f===filter?'active':''}" onclick="renderOrders('${f}')">${f==='all'?'All':f}</div>`).join('')}
+        </div>
+        ${filtered.length ? `<div class="tbl-wrap"><table>
+          <thead><tr><th>Order ID</th><th>Service</th><th>Link</th><th>Qty</th><th>Charge</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>${filtered.map(o=>`
+            <tr><td class="mono" style="color:var(--gold);font-weight:700">${o.id}</td><td style="max-width:220px">${o.service}</td><td class="mono" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.link}</td><td>${o.qty.toLocaleString()}</td><td class="rate">${NX.money(o.charge)}</td><td>${badge(o.status)}</td><td class="mono">${fmt(o.date)}</td></tr>
+          `).join('')}</tbody>
+        </table></div>` : `<div class="empty">${icon('shopping')}<p>No orders found</p></div>`}
+      </div>
+    </div>`;
+}
+function badge(s){
+  const m = {'Pending':'b-pending','In Progress':'b-progress','Completed':'b-completed','Cancelled':'b-cancelled','Partial':'b-partial'};
+  return `<span class="badge ${m[s]||'b-pending'}">${s}</span>`;
+}
+function fmt(iso){const d=new Date(iso);return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}
+
+/* ---------- FUNDS ---------- */
+function renderFunds(){
+  const db = NX.load();
+  const userDeposits = db.deposits.filter(d=>d.userId===USER.id).slice(0,10);
+  $('content').innerHTML = `
+    <div class="page active">
+      <div class="page-head"><h1>Add Funds</h1><p>Wallet top-up — pending approval tak wait karein</p></div>
+      <div class="form-grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:start">
+        <div class="card" style="margin:0">
+          <div class="card-head"><h2>${icon('wallet')} Deposit Request</h2></div>
+          <div class="form-grid" style="grid-template-columns:1fr">
+            <div class="form-group"><label>Amount (₹)</label><input type="number" id="fundAmt" placeholder="e.g. 500" min="10"/></div>
+            <div class="form-group"><label>Payment Method</label><select id="fundMethod"><option>UPI</option><option>Razorpay</option><option>Bank Transfer</option><option>Paytm</option><option>PhonePe</option></select></div>
+            <div class="chips">${[100,500,1000,5000].map(v=>`<div class="chip" onclick="$('fundAmt').value=${v}">₹${v}</div>`).join('')}</div>
+            <button class="btn btn-gold btn-block" onclick="reqDeposit()">Request Deposit</button>
+            <p style="font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.6">Note: Deposit request admin approval ke baad aapke wallet me add hoga. UPI: <b style="color:var(--gold)">${db.settings.upiId||'nexboost@upi'}</b></p>
+          </div>
+        </div>
+        <div class="card" style="margin:0">
+          <div class="card-head"><h2>${icon('wallet')} Wallet</h2></div>
+          <div style="padding:22px;background:linear-gradient(135deg,rgba(245,183,76,.14),rgba(139,92,246,.06));border:1px solid rgba(245,183,76,.3);border-radius:14px;text-align:center">
+            <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:8px">AVAILABLE BALANCE</div>
+            <div style="font-size:34px;font-weight:800;letter-spacing:-1px;background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;color:transparent">${NX.money(USER.balance)}</div>
+          </div>
+          <div style="margin-top:16px;font-size:12.5px;color:var(--muted);line-height:1.7">
+            <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)"><span>Total Spent</span><b style="color:var(--text)">${NX.money(USER.totalSpent||0)}</b></div>
+            <div style="display:flex;justify-content:space-between;padding:9px 0"><span>Total Added</span><b style="color:#4ade80">${NX.money(USER.totalAdded||0)}</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>${icon('clock')} Deposit History</h2></div>
+        ${userDeposits.length?`<div class="tbl-wrap"><table>
+          <thead><tr><th>ID</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>${userDeposits.map(d=>`<tr><td class="mono" style="color:var(--gold)">${d.id}</td><td class="rate">${NX.money(d.amount)}</td><td>${d.method}</td><td>${badge(d.status)}</td><td class="mono">${fmt(d.date)}</td></tr>`).join('')}</tbody>
+        </table></div>`:`<div class="empty">${icon('wallet')}<p>No deposits yet</p></div>`}
+      </div>
+    </div>`;
+}
+function reqDeposit(){
+  const amt = Number($('fundAmt').value);
+  const method = $('fundMethod').value;
+  const db = NX.load();
+  if (!amt || amt < db.settings.minDeposit) return toast(`Minimum deposit is ${NX.money(db.settings.minDeposit)}`,'err');
+  const r = NX.createDeposit(USER.id, amt, method);
+  if (!r.ok) return toast(r.msg,'err');
+  toast(`Deposit request submitted! Admin approval pending ⏳`,'ok');
+  renderFunds();
+}
+
+/* ---------- TICKETS ---------- */
+function renderTickets(){
+  const tickets = NX.load().tickets.filter(t=>t.userId===USER.id);
+  $('content').innerHTML = `
+    <div class="page active">
+      <div class="page-head"><h1>Support Tickets</h1><p>Raise a ticket for any issue</p></div>
+      <div class="card">
+        <div class="card-head"><h2>${icon('message')} Create Ticket</h2></div>
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="form-group"><label>Subject</label><input type="text" id="tkSub" placeholder="Order issue, refund, etc."/></div>
+          <div class="form-group"><label>Priority</label><select id="tkPri"><option>Low</option><option selected>Medium</option><option>High</option></select></div>
+          <div class="form-group"><label>Message</label><textarea id="tkMsg" placeholder="Describe your issue..."></textarea></div>
+          <button class="btn btn-gold" onclick="createTicket()">Submit Ticket</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>${icon('clock')} My Tickets</h2></div>
+        ${tickets.length?`<div class="tbl-wrap"><table>
+          <thead><tr><th>ID</th><th>Subject</th><th>Priority</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>${tickets.map(t=>`<tr><td class="mono" style="color:var(--gold)">${t.id}</td><td>${t.subject}</td><td>${t.priority}</td><td>${badge(t.status)}</td><td class="mono">${fmt(t.date)}</td></tr>`).join('')}</tbody>
+        </table></div>`:`<div class="empty">${icon('message')}<p>No tickets yet</p></div>`}
+      </div>
+    </div>`;
+}
+function createTicket(){
+  const sub = $('tkSub').value.trim();
+  const msg = $('tkMsg').value.trim();
+  const pri = $('tkPri').value;
+  if (!sub || !msg) return toast('Subject and message required','err');
+  NX.createTicket(USER.id, sub, msg, pri);
+  toast('Ticket created ✅','ok');
+  renderTickets();
+}
+
+/* ---------- PROFILE ---------- */
+function renderProfile(){
+  $('content').innerHTML = `
+    <div class="page active">
+      <div class="page-head"><h1>Profile</h1><p>Account details</p></div>
+      <div class="form-grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+        <div class="card">
+          <div class="card-head"><h2>${icon('user')} Account</h2></div>
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+            <div class="avatar" style="width:60px;height:60px;border-radius:16px;font-size:24px">${USER.name.charAt(0).toUpperCase()}</div>
+            <div><div style="font-size:18px;font-weight:800">${USER.name}</div><div style="font-size:12.5px;color:var(--muted);margin-top:3px">${USER.email}</div></div>
+          </div>
+          <div class="form-group" style="margin-bottom:14px"><label>Full Name</label><input type="text" id="pfName" value="${USER.name}"/></div>
+          <button class="btn btn-gold btn-block" onclick="saveProfile()">Save</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>${icon('user')} Change Password</h2></div>
+          <div class="form-grid" style="grid-template-columns:1fr">
+            <div class="form-group"><label>Current Password</label><input type="password" id="cpOld"/></div>
+            <div class="form-group"><label>New Password</label><input type="password" id="cpNew"/></div>
+            <button class="btn btn-ghost btn-block" onclick="changePass()">Update Password</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+function saveProfile(){
+  const n = $('pfName').value.trim();
+  if (n.length<2) return toast('Invalid name','err');
+  NX.updateUser(USER.id,{name:n});
+  toast('Profile updated ✅','ok');
+  refreshUser(); renderProfile();
+}
+function changePass(){
+  const oldP = $('cpOld').value, np = $('cpNew').value;
+  if (NX.hash(oldP) !== USER.pass) return toast('Current password is incorrect','err');
+  if (np.length < 6) return toast('New password must be 6+ characters','err');
+  NX.updateUser(USER.id,{pass:NX.hash(np)});
+  toast('Password updated 🔐','ok');
+  $('cpOld').value='';$('cpNew').value='';
+}
+
+/* ---------- LOGOUT ---------- */
+function confirmLogout(){
+  openModal('Logout?','Aap logout karna chahte hain?',()=>{
+    NX.logout(); window.location.href = 'index.html';
+  });
+}
+
+/* ---------- BOOT ---------- */
+renderSidebar();
+refreshUser();
+go('home');
+</script>
+</body>
+</html>

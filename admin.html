@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin — NexBoost</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E👑%3C/text%3E%3C/svg%3E"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#06070c;--bg2:#0a0c14;--card:#0f1119;--card2:#141722;--border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);--text:#eceef7;--muted:#8288a3;--dim:#5a5f7a;--gold:#f5b74c;--gold2:#ffd97a;--purple:#8b5cf6;--purple2:#c084fc;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--blue:#3b82f6;--cyan:#06b6d4;--grad-gold:linear-gradient(135deg,#f5b74c 0%,#ffd97a 50%,#f59e0b 100%);--grad-purple:linear-gradient(135deg,#8b5cf6 0%,#c084fc 100%)}
+html,body{height:100%}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button,input,select,textarea{font-family:inherit;font-size:inherit;outline:none;border:none}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#232838;border-radius:10px}
+.hidden{display:none!important}
+
+/* LOGIN */
+.login-screen{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;background:radial-gradient(circle at 15% 20%,rgba(139,92,246,.22) 0%,transparent 45%),radial-gradient(circle at 85% 80%,rgba(245,183,76,.15) 0%,transparent 45%),#06070c}
+.login-screen::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:52px 52px;mask-image:radial-gradient(ellipse at center,#000 15%,transparent 70%);pointer-events:none}
+.login-box{position:relative;width:100%;max-width:440px;background:linear-gradient(160deg,rgba(20,23,34,.92),rgba(12,14,20,.96));backdrop-filter:blur(28px);border:1px solid rgba(245,183,76,.2);border-radius:24px;padding:44px 38px;box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04) inset;animation:rise .6s}
+@keyframes rise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.crown{width:64px;height:64px;margin:0 auto 20px;border-radius:19px;background:var(--grad-gold);display:grid;place-items:center;font-size:32px;box-shadow:0 14px 40px rgba(245,183,76,.4)}
+.login-box h1{text-align:center;font-size:24px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px}
+.login-box h1 span{background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+.login-box .sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:28px}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:15px}
+.field label{font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
+.iw{position:relative;display:flex;align-items:center}
+.iw svg{position:absolute;left:14px;width:17px;height:17px;stroke:var(--muted);fill:none;stroke-width:2;pointer-events:none}
+.iw input{width:100%;padding:13px 14px 13px 42px;background:rgba(6,7,12,.7);border:1px solid var(--border2);border-radius:11px;color:var(--text);font-size:14px;transition:.25s}
+.iw input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(245,183,76,.12)}
+.iw input::placeholder{color:#454a62}
+.login-btn{width:100%;padding:14px;border-radius:12px;background:var(--grad-gold);color:#1a1200;font-weight:800;font-size:14.5px;cursor:pointer;transition:.25s;margin-top:8px;box-shadow:0 12px 30px rgba(245,183,76,.3)}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 16px 38px rgba(245,183,76,.45)}
+.login-err{padding:11px 14px;border-radius:10px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;font-size:13px;font-weight:500;display:none;margin-bottom:14px}
+.login-err.show{display:block;animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.login-foot{margin-top:22px;padding-top:18px;border-top:1px solid var(--border);text-align:center;font-size:11.5px;color:var(--dim);line-height:1.7}
+.secure{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.22);color:#4ade80;font-size:10.5px;font-weight:800;margin-bottom:12px;letter-spacing:.4px}
+.secure::before{content:'';width:6px;height:6px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px #4ade80}
+
+/* APP */
+.app{display:flex;min-height:100vh}
+.sidebar{width:264px;background:linear-gradient(180deg,#0a0c14,#08090f);border-right:1px solid var(--border);position:fixed;height:100vh;display:flex;flex-direction:column;z-index:100;transition:transform .3s}
+.sb-head{padding:18px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:11px}
+.sb-logo{width:40px;height:40px;border-radius:12px;background:var(--grad-gold);display:grid;place-items:center;font-size:19px;flex-shrink:0;box-shadow:0 8px 22px rgba(245,183,76,.35)}
+.sb-head h2{font-size:15px;font-weight:800;letter-spacing:-.3px}
+.sb-head h2 span{background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sb-head p{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.5px;margin-top:1px}
+.sb-search{padding:12px 14px 4px}
+.sb-search input{width:100%;padding:9px 12px;background:rgba(6,7,12,.7);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:12px}
+.sb-search input:focus{border-color:rgba(245,183,76,.4)}
+.sb-nav{flex:1;overflow-y:auto;padding:8px 10px 20px}
+.sb-nav::-webkit-scrollbar{width:5px}
+.nav-group-label{font-size:9.5px;font-weight:800;color:var(--dim);letter-spacing:1.3px;padding:14px 12px 6px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;color:var(--muted);font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s;margin-bottom:1px;position:relative}
+.nav-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.nav-item.active{background:linear-gradient(90deg,rgba(245,183,76,.15),transparent);color:var(--gold)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:55%;background:var(--gold);border-radius:0 4px 4px 0;box-shadow:0 0 10px var(--gold)}
+.nav-badge{margin-left:auto;padding:2px 7px;border-radius:8px;background:rgba(239,68,68,.15);color:#f87171;font-size:9.5px;font-weight:800}
+
+.main{flex:1;margin-left:264px;display:flex;flex-direction:column;min-width:0}
+.topbar{height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--border);background:rgba(6,7,12,.85);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50}
+.tb-left{display:flex;align-items:center;gap:14px}
+.menu-btn{display:none;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px;cursor:pointer}
+.menu-btn svg{width:18px;height:18px;stroke:var(--text);display:block;fill:none;stroke-width:2}
+.tb-title{font-size:16px;font-weight:800;letter-spacing:-.3px}
+.tb-title .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);margin-right:8px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-icon{width:38px;height:38px;border-radius:10px;background:var(--card);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;transition:.2s;position:relative}
+.tb-icon:hover{border-color:var(--gold)}
+.tb-icon svg{width:17px;height:17px;stroke:var(--text);fill:none;stroke-width:2}
+.tb-icon .badge{position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:9px;font-weight:800;display:grid;place-items:center;border:2px solid var(--bg)}
+.tb-admin{display:flex;align-items:center;gap:9px;padding:5px 8px 5px 5px;border-radius:11px;background:var(--card);border:1px solid var(--border);cursor:pointer}
+.tb-admin .av{width:30px;height:30px;border-radius:8px;background:var(--grad-gold);display:grid;place-items:center;font-weight:800;font-size:12px;color:#1a1200}
+.tb-admin b{font-size:12px}
+.tb-admin span{font-size:9.5px;color:var(--gold);font-weight:700;display:block}
+
+.content{padding:22px 24px 60px;flex:1}
+.page{display:none}.page.active{display:block;animation:fade .3s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.page-head h1{font-size:22px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:10px}
+.page-head h1 .ic{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,rgba(245,183,76,.18),rgba(139,92,246,.1));border:1px solid rgba(245,183,76,.25);display:grid;place-items:center}
+.page-head h1 .ic svg{width:17px;height:17px;stroke:var(--gold);fill:none;stroke-width:2}
+.page-head p{font-size:12.5px;color:var(--muted);margin-top:5px}
+.page-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+.btn{padding:10px 16px;border-radius:10px;font-weight:700;font-size:12.5px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2}
+.btn-gold{background:var(--grad-gold);color:#1a1200;box-shadow:0 6px 18px rgba(245,183,76,.28)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(245,183,76,.42)}
+.btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--border2)}
+.btn-ghost:hover{border-color:var(--gold);background:rgba(245,183,76,.05)}
+.btn-danger{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+.btn-danger:hover{background:rgba(239,68,68,.2)}
+.btn-green{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.25)}
+.btn-green:hover{background:rgba(34,197,94,.2)}
+.btn-sm{padding:6px 11px;font-size:11.5px;border-radius:8px}
+.btn-sm svg{width:12px;height:12px}
+.btn-block{width:100%}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
+.stat{background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:16px;padding:18px;position:relative;overflow:hidden;transition:.25s}
+.stat:hover{transform:translateY(-3px);border-color:rgba(245,183,76,.25)}
+.stat .ic{width:38px;height:38px;border-radius:11px;background:rgba(245,183,76,.1);border:1px solid rgba(245,183,76,.2);display:grid;place-items:center;margin-bottom:12px}
+.stat .ic svg{width:18px;height:18px;stroke:var(--gold);fill:none;stroke-width:2}
+.stat .lbl{font-size:11.5px;color:var(--muted);font-weight:600;margin-bottom:4px}
+.stat .val{font-size:22px;font-weight:800;letter-spacing:-.5px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:18px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.card-head h2{font-size:15px;font-weight:800;display:flex;align-items:center;gap:9px}
+.card-head h2 svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:2}
+.card-head p{font-size:11.5px;color:var(--muted);margin-top:2px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+
+.tbl-wrap{overflow-x:auto;border-radius:11px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:600px}
+thead{background:rgba(6,7,12,.6)}
+th{text-align:left;padding:11px 14px;font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(245,183,76,.03)}
+.rate{color:#4ade80;font-weight:700}
+.mono{font-family:'SF Mono',Consolas,monospace;font-size:11px;color:var(--muted)}
+
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:800;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+.b-pending{background:rgba(245,158,11,.13);color:#fbbf24}
+.b-progress{background:rgba(59,130,246,.13);color:#60a5fa}
+.b-completed{background:rgba(34,197,94,.13);color:#4ade80}
+.b-partial{background:rgba(139,92,246,.13);color:#c084fc}
+.b-cancelled{background:rgba(239,68,68,.13);color:#f87171}
+.b-failed{background:rgba(120,113,108,.18);color:#a8a29e}
+.b-active{background:rgba(34,197,94,.13);color:#4ade80}
+.b-suspended{background:rgba(245,158,11,.13);color:#fbbf24}
+.b-banned{background:rgba(239,68,68,.13);color:#f87171}
+.b-gold{background:rgba(245,183,76,.13);color:#f5b74c}
+
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.fg{display:flex;flex-direction:column;gap:6px}
+.fg label{font-size:11.5px;font-weight:700;color:var(--muted)}
+.fg input,.fg select,.fg textarea{padding:10px 12px;background:rgba(6,7,12,.6);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:13px;transition:.2s;width:100%}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,183,76,.1)}
+.fg select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238288a3' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.fg select option{background:#0f1119}
+.fg textarea{resize:vertical;min-height:70px;font-family:inherit}
+.full{grid-column:1/-1}
+
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.chip{padding:6px 13px;border-radius:20px;background:var(--card2);border:1px solid var(--border);color:var(--muted);font-size:11.5px;font-weight:700;cursor:pointer;transition:.2s}
+.chip:hover{border-color:var(--border2);color:var(--text)}
+.chip.active{background:var(--grad-gold);color:#1a1200;border-color:transparent}
+
+.empty{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty svg{width:44px;height:44px;stroke:#2a2f42;margin-bottom:10px;fill:none;stroke-width:1.5}
+.empty p{font-size:13px}
+
+.toggle{position:relative;display:inline-flex;align-items:center;cursor:pointer}
+.toggle input{display:none}
+.toggle .track{width:40px;height:22px;border-radius:12px;background:#232838;position:relative;transition:.25s}
+.toggle .track::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#8288a3;transition:.25s}
+.toggle input:checked + .track{background:rgba(245,183,76,.25)}
+.toggle input:checked + .track::after{transform:translateX(18px);background:var(--gold);box-shadow:0 0 10px rgba(245,183,76,.6)}
+
+.setting-row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.setting-row h4{font-size:13px;font-weight:700;margin-bottom:2px}
+.setting-row p{font-size:11.5px;color:var(--muted)}
+
+.activity-list{display:flex;flex-direction:column;gap:2px;max-height:400px;overflow-y:auto}
+.activity-item{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;transition:.15s}
+.activity-item:hover{background:rgba(255,255,255,.025)}
+.ai-icon{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex-shrink:0;background:rgba(245,183,76,.1);border:1px solid rgba(245,183,76,.18)}
+.ai-icon svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:2}
+.ai-icon.green{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.2)}.ai-icon.green svg{stroke:#4ade80}
+.ai-icon.red{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.2)}.ai-icon.red svg{stroke:#f87171}
+.ai-icon.blue{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.2)}.ai-icon.blue svg{stroke:#60a5fa}
+.ai-icon.purple{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.2)}.ai-icon.purple svg{stroke:#c084fc}
+.ai-icon.gold{background:rgba(245,183,76,.1);border-color:rgba(245,183,76,.2)}.ai-icon.gold svg{stroke:var(--gold)}
+.ai-icon.yellow{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.2)}.ai-icon.yellow svg{stroke:#fbbf24}
+.ai-body{flex:1;min-width:0}
+.ai-body .t{font-size:12.5px;font-weight:600;line-height:1.4}
+.ai-body .s{font-size:11px;color:var(--dim);margin-top:2px}
+.ai-time{font-size:10.5px;color:var(--dim);font-weight:600;white-space:nowrap}
+
+.toast-wrap{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:9px}
+.toast{display:flex;align-items:center;gap:11px;padding:13px 17px;border-radius:12px;background:rgba(15,17,25,.97);border:1px solid var(--border2);backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.5);font-size:12.5px;font-weight:600;animation:slideIn .35s;min-width:240px;max-width:340px}
+@keyframes slideIn{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+.toast.out{animation:slideOut .3s forwards}
+@keyframes slideOut{to{opacity:0;transform:translateX(60px)}}
+.toast .ti{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px;flex-shrink:0;font-weight:800}
+.toast.ok .ti{background:rgba(34,197,94,.18);color:#4ade80}
+.toast.err .ti{background:rgba(239,68,68,.18);color:#f87171}
+.toast.info .ti{background:rgba(245,183,76,.18);color:var(--gold)}
+
+.modal-bg{position:fixed;inset:0;background:rgba(3,4,8,.82);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px;overflow-y:auto}
+.modal-bg.show{display:flex;animation:fade .25s}
+.modal{background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--border2);border-radius:18px;padding:24px;max-width:500px;width:100%;animation:rise .3s;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:17px;font-weight:800;margin-bottom:6px}
+.modal p{font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.modal-actions{display:flex;gap:9px;margin-top:16px}
+.modal-actions .btn{flex:1}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:90;display:none}
+.overlay.show{display:block}
+
+.chart-bars{display:flex;align-items:flex-end;gap:7px;height:110px;padding:8px 0}
+.chart-bars .bar{flex:1;background:linear-gradient(180deg,var(--gold),rgba(245,183,76,.15));border-radius:5px 5px 0 0;position:relative;min-height:6px}
+.chart-bars .bar span{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--dim);font-weight:700;white-space:nowrap}
+
+@media(max-width:1024px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.menu-btn{display:block}.tb-admin b{display:none}}
+@media(max-width:640px){.content{padding:14px}.topbar{padding:0 14px}.stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.stat .val{font-size:18px}.page-head h1{font-size:18px}.toast-wrap{left:14px;right:14px;bottom:14px}.toast{max-width:none}.login-box{padding:30px 22px}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="crown">👑</div>
+    <h1>Nex<span>Boost</span> Admin</h1>
+    <p class="sub">Premium SMM Panel Control Center</p>
+    <div class="login-err" id="loginErr"></div>
+    <form id="loginForm" autocomplete="off">
+      <div class="field"><label>Admin Email</label>
+        <div class="iw"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <input type="email" id="adminEmail" placeholder="admin@nexboost.com" required/></div></div>
+      <div class="field"><label>Password</label>
+        <div class="iw"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="adminPass" placeholder="••••••••" required/></div></div>
+      <button type="submit" class="login-btn">🔐 Access Admin Panel</button>
+    </form>
+    <div class="login-foot">
+      <div class="secure">SECURE ADMIN ACCESS</div><br>
+      Authorized personnel only • All activity logged<br>© 2025 NexBoost SMM Panel
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app hidden" id="app">
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head">
+      <div class="sb-logo">👑</div>
+      <div><h2>Nex<span>Boost</span></h2><p>ADMIN CONTROL</p></div>
+    </div>
+    <div class="sb-search"><input type="text" placeholder="🔍 Search modules..." oninput="searchModules(this.value)"/></div>
+    <nav class="sb-nav" id="sbNav"></nav>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="tb-left">
+        <button class="menu-btn" onclick="toggleSidebar()"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <div class="tb-title"><span class="dot"></span><span id="tbTitle">Dashboard</span></div>
+      </div>
+      <div class="tb-right">
+        <div class="tb-icon" onclick="toast('Notifications','info')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge">7</span></div>
+        <div class="tb-admin" onclick="confirmLogout()"><div class="av">A</div><div><b>Admin</b><span>SUPER ADMIN</span></div></div>
+      </div>
+    </header>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="modal-bg" id="modalBg">
+  <div class="modal" id="modalInner">
+    <h3 id="modalTitle">Confirm</h3>
+    <p id="modalText">Are you sure?</p>
+    <div class="modal-actions" id="modalActions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" id="modalConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+/* ============================================================
+   ADMIN PANEL — FULL WORKING CODE
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const money = NX.money;
+
+/* ---------- LOGIN ---------- */
+$('loginForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const email = $('adminEmail').value.trim();
+  const pass = $('adminPass').value;
+  $('loginErr').classList.remove('show');
+  if (NX.adminLogin(email, pass)){
+    $('loginScreen').classList.add('hidden');
+    $('app').classList.remove('hidden');
+    boot();
+    toast('Welcome back, Admin! 👑','ok');
+  } else {
+    $('loginErr').textContent = '❌ Invalid credentials. Access denied.';
+    $('loginErr').classList.add('show');
+  }
+});
+
+function confirmLogout(){
+  openModal('Logout Admin?','Aap admin panel se logout karna chahte hain?',()=>{
+    NX.adminLogout();
+    $('app').classList.add('hidden');
+    $('loginScreen').classList.remove('hidden');
+    $('loginForm').reset();
+    toast('Logged out','info');
+  });
+}
+
+/* ---------- HELPERS ---------- */
+function toast(msg, type='info'){
+  const i = {ok:'✓',err:'✕',info:'i'};
+  const el = document.createElement('div');
+  el.className = 'toast '+type;
+  el.innerHTML = `<div class="ti">${i[type]}</div><div>${msg}</div>`;
+  $('toastWrap').appendChild(el);
+  setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),300)},3000);
+}
+let modalCb = null;
+function openModal(title, text, cb, confirmText){
+  $('modalTitle').textContent = title;
+  $('modalText').innerHTML = text;
+  $('modalConfirm').textContent = confirmText || 'Confirm';
+  $('modalBg').classList.add('show');
+  modalCb = cb;
+}
+function closeModal(){ $('modalBg').classList.remove('show'); modalCb = null; }
+$('modalConfirm').onclick = () => { if(modalCb) modalCb(); closeModal(); };
+$('modalBg').onclick = e => { if(e.target.id==='modalBg') closeModal(); };
+
+function toggleSidebar(){ $('sidebar').classList.toggle('open'); $('overlay').classList.toggle('show'); }
+function closeSidebar(){ $('sidebar').classList.remove('open'); $('overlay').classList.remove('show'); }
+
+/* ---------- SIDEBAR MODULES ---------- */
+const MODULES = [
+  {group:'Overview', items:[
+    {id:'dashboard', label:'Dashboard'},
+    {id:'analytics', label:'Reports & Analytics'},
+  ]},
+  {group:'Users & Finance', items:[
+    {id:'users', label:'User Management'},
+    {id:'wallet', label:'Wallet & Balance'},
+    {id:'deposits', label:'Payments & Deposits'},
+    {id:'withdrawals', label:'Withdrawals'},
+  ]},
+  {group:'Services & Orders', items:[
+    {id:'services', label:'Service Management'},
+    {id:'categories', label:'Categories'},
+    {id:'orders', label:'Order Management'},
+    {id:'providers', label:'Provider API'},
+  ]},
+  {group:'Engagement', items:[
+    {id:'tickets', label:'Support Tickets'},
+    {id:'notifications', label:'Notifications'},
+    {id:'coupons', label:'Coupons & Promos'},
+  ]},
+  {group:'Configuration', items:[
+    {id:'settings', label:'Website Settings'},
+    {id:'staff', label:'Admin & Staff'},
+  ]},
+  {group:'System', items:[
+    {id:'logs', label:'Logs & Monitoring'},
+    {id:'database', label:'Database & Backup'},
+  ]},
+];
+
+function renderSidebar(){
+  $('sbNav').innerHTML = MODULES.map(g => `
+    <div class="nav-group" data-group="${g.group}">
+      <div class="nav-group-label">${g.group}</div>
+      ${g.items.map(it => `<div class="nav-item" data-page="${it.id}" onclick="go('${it.id}')"><span>${it.label}</span>${badgeFor(it.id)}</div>`).join('')}
+    </div>
+  `).join('');
+}
+function badgeFor(id){
+  const db = NX.load();
+  if (id==='deposits'){
+    const n = db.deposits.filter(d=>d.status==='Pending').length;
+    return n ? `<span class="nav-badge">${n}</span>` : '';
+  }
+  if (id==='withdrawals'){
+    const n = db.withdrawals.filter(w=>w.status==='Pending').length;
+    return n ? `<span class="nav-badge">${n}</span>` : '';
+  }
+  if (id==='tickets'){
+    const n = db.tickets.filter(t=>t.status==='Open'||t.status==='Pending').length;
+    return n ? `<span class="nav-badge">${n}</span>` : '';
+  }
+  return '';
+}
+function searchModules(q){
+  q = q.toLowerCase().trim();
+  document.querySelectorAll('.nav-group').forEach(g => {
+    let vis = 0;
+    g.querySelectorAll('.nav-item').forEach(it => {
+      const m = !q || it.textContent.toLowerCase().includes(q);
+      it.style.display = m ? '' : 'none';
+      if (m) vis++;
+    });
+    g.style.display = vis ? '' : 'none';
+  });
+}
+
+/* ---------- NAV ---------- */
+function go(page){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.page===page));
+  closeSidebar();
+  window.scrollTo({top:0,behavior:'smooth'});
+  const titles = {dashboard:'Dashboard',analytics:'Reports & Analytics',users:'User Management',wallet:'Wallet & Balance',deposits:'Payments & Deposits',withdrawals:'Withdrawals',services:'Service Management',categories:'Categories',orders:'Order Management',providers:'Provider API',tickets:'Support Tickets',notifications:'Notifications',coupons:'Coupons & Promos',settings:'Website Settings',staff:'Admin & Staff',logs:'Logs & Monitoring',database:'Database & Backup'};
+  $('tbTitle').textContent = titles[page] || 'Dashboard';
+  const r = {dashboard:renderDashboard,analytics:renderAnalytics,users:renderUsers,wallet:renderWallet,deposits:renderDeposits,withdrawals:renderWithdrawals,services:renderServices,categories:renderCategories,orders:renderOrders,providers:renderProviders,tickets:renderTickets,notifications:renderNotifications,coupons:renderCoupons,settings:renderSettings,staff:renderStaff,logs:renderLogs,database:renderDatabase};
+  if (r[page]) r[page]();
+}
+
+/* ---------- BADGE HELPERS ---------- */
+function badge(s){
+  const m = {'Active':'b-active','Completed':'b-completed','Pending':'b-pending','In Progress':'b-progress','Partial':'b-partial','Cancelled':'b-cancelled','Failed':'b-failed','Suspended':'b-suspended','Banned':'b-banned','Approved':'b-completed','Rejected':'b-cancelled','Open':'b-pending','Answered':'b-progress','Closed':'b-failed'};
+  return `<span class="badge ${m[s]||'b-pending'}">${s}</span>`;
+}
+function fmt(iso){const d=new Date(iso);return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'2-digit'})+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}
+
+/* ---------- PAGES ---------- */
+
+/* === DASHBOARD === */
+function renderDashboard(){
+  const db = NX.load();
+  const totalUsers = db.users.length;
+  const activeUsers = db.users.filter(u=>u.status==='Active').length;
+  const suspended = db.users.filter(u=>u.status==='Suspended').length;
+  const totalOrders = db.orders.length;
+  const pending = db.orders.filter(o=>o.status==='Pending').length;
+  const processing = db.orders.filter(o=>o.status==='In Progress').length;
+  const completed = db.orders.filter(o=>o.status==='Completed').length;
+  const totalRev = db.orders.reduce((s,o)=>s+o.charge,0);
+  const totalProfit = db.orders.reduce((s,o)=>s+o.profit,0);
+  const totalDeposits = db.deposits.filter(d=>d.status==='Approved').reduce((s,d)=>s+d.amount,0);
+
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head">
+      <div><h1><span class="ic">📊</span> Dashboard Overview</h1><p>Live statistics from user panel • Updated automatically</p></div>
+      <div class="page-actions">
+        <button class="btn btn-ghost" onclick="refreshAll()">🔄 Refresh</button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="ic">👥</div><div class="lbl">Total Users</div><div class="val">${totalUsers}</div></div>
+      <div class="stat"><div class="ic">✅</div><div class="lbl">Active Users</div><div class="val" style="color:#4ade80">${activeUsers}</div></div>
+      <div class="stat"><div class="ic">⚠️</div><div class="lbl">Suspended</div><div class="val" style="color:#fbbf24">${suspended}</div></div>
+      <div class="stat"><div class="ic">📦</div><div class="lbl">Total Orders</div><div class="val">${totalOrders}</div></div>
+      <div class="stat"><div class="ic">⏳</div><div class="lbl">Pending Orders</div><div class="val" style="color:#fbbf24">${pending}</div></div>
+      <div class="stat"><div class="ic">⚙️</div><div class="lbl">Processing</div><div class="val" style="color:#60a5fa">${processing}</div></div>
+      <div class="stat"><div class="ic">✔️</div><div class="lbl">Completed</div><div class="val" style="color:#4ade80">${completed}</div></div>
+      <div class="stat"><div class="ic">💰</div><div class="lbl">Total Revenue</div><div class="val" style="color:var(--gold)">${money(totalRev)}</div></div>
+      <div class="stat"><div class="ic">📈</div><div class="lbl">Net Profit</div><div class="val" style="color:#4ade80">${money(totalProfit)}</div></div>
+      <div class="stat"><div class="ic">💳</div><div class="lbl">Approved Deposits</div><div class="val" style="color:var(--gold)">${money(totalDeposits)}</div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><div><h2>📊 Monthly Revenue</h2><p>Last 8 months</p></div></div>
+        <div class="chart-bars">
+          ${[45,62,38,78,55,92,70,85].map((h,i)=>`<div class="bar" style="height:${h}%"><span>${['Nov','Dec','Jan','Feb','Mar','Apr','May','Jun'][i]}</span></div>`).join('')}
+        </div>
+        <div style="margin-top:24px;display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
+          <span>Peak: <b style="color:var(--gold)">₹92,400</b></span>
+          <span>Avg: <b style="color:#4ade80">₹65,600</b></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><h2>🕐 Recent Activity</h2><p>Live logs</p></div></div>
+        <div class="activity-list">
+          ${db.logs.slice(0,8).map(l => `
+            <div class="activity-item">
+              <div class="ai-icon ${l.type}">${typeIcon(l.type)}</div>
+              <div class="ai-body"><div class="t">${l.action}</div><div class="s">${l.detail}</div></div>
+              <div class="ai-time">${timeAgo(l.time)}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><div><h2>📦 Recent Orders</h2><p>Latest 5 orders</p></div><button class="btn btn-ghost btn-sm" onclick="go('orders')">View All →</button></div>
+        ${db.orders.length?`<div class="tbl-wrap"><table>
+          <thead><tr><th>ID</th><th>User</th><th>Service</th><th>Charge</th><th>Status</th></tr></thead>
+          <tbody>${db.orders.slice(0,5).map(o=>`<tr><td class="mono" style="color:var(--gold)">${o.id}</td><td>${o.userName}</td><td style="max-width:180px">${o.service}</td><td class="rate">${money(o.charge)}</td><td>${badge(o.status)}</td></tr>`).join('')}</tbody>
+        </table></div>`:`<div class="empty"><p>No orders</p></div>`}
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div><h2>💳 Recent Deposits</h2><p>Latest requests</p></div><button class="btn btn-ghost btn-sm" onclick="go('deposits')">Manage →</button></div>
+        ${db.deposits.length?`<div class="tbl-wrap"><table>
+          <thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>${db.deposits.slice(0,5).map(d=>`<tr><td class="mono" style="color:var(--gold)">${d.id}</td><td>${d.userName}</td><td class="rate">${money(d.amount)}</td><td>${badge(d.status)}</td></tr>`).join('')}</tbody>
+        </table></div>`:`<div class="empty"><p>No deposits</p></div>`}
+      </div>
+    </div>
+  </div>`;
+}
+function typeIcon(t){
+  const i = {green:'✔️',red:'⚠️',blue:'🔷',purple:'👤',gold:'💰',yellow:'⚡'};
+  return i[t]||'📌';
+}
+function timeAgo(iso){
+  const d = new Date(iso);
+  const s = Math.floor((Date.now()-d)/1000);
+  if (s<60) return s+'s ago';
+  if (s<3600) return Math.floor(s/60)+'m ago';
+  if (s<86400) return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+function refreshAll(){ toast('Data refreshed ✅','ok'); go('dashboard'); }
+
+/* === ANALYTICS === */
+function renderAnalytics(){
+  const db = NX.load();
+  const totalRev = db.orders.reduce((s,o)=>s+o.charge,0);
+  const totalCost = db.orders.reduce((s,o)=>s+o.cost,0);
+  const totalProfit = totalRev-totalCost;
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head"><div><h1><span class="ic">📈</span> Reports & Analytics</h1><p>Business insights</p></div>
+      <div class="page-actions"><button class="btn btn-ghost" onclick="NX.exportBackup();toast('Backup exported','ok')">⬇️ Export Data</button></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="ic">💰</div><div class="lbl">Total Revenue</div><div class="val" style="color:var(--gold)">${money(totalRev)}</div></div>
+      <div class="stat"><div class="ic">💸</div><div class="lbl">Provider Cost</div><div class="val" style="color:#f87171">${money(totalCost)}</div></div>
+      <div class="stat"><div class="ic">📈</div><div class="lbl">Net Profit</div><div class="val" style="color:#4ade80">${money(totalProfit)}</div></div>
+      <div class="stat"><div class="ic">📊</div><div class="lbl">Margin</div><div class="val" style="color:#60a5fa">${totalRev?((totalProfit/totalRev)*100).toFixed(1):0}%</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><div><h2>🏆 Top Services by Revenue</h2></div></div>
+        ${(() => {
+          const map = {};
+          db.orders.forEach(o => { map[o.service] = (map[o.service]||0) + o.charge; });
+          const sorted = Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,6);
+          return sorted.length ? sorted.map(([name,rev])=>{const max=sorted[0][1];return `
+            <div style="margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><b>${name}</b><span style="color:var(--gold);font-weight:700">${money(rev)}</span></div>
+              <div style="height:6px;background:#1a1e2c;border-radius:6px;overflow:hidden"><div style="height:100%;width:${(rev/max*100)}%;background:var(--grad-gold);border-radius:6px"></div></div>
+            </div>`}).join('') : '<div class="empty"><p>No data</p></div>';
+        })()}
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h2>👥 Top Users by Spending</h2></div></div>
+        ${(() => {
+          const arr = [...db.users].sort((a,b)=>(b.totalSpent||0)-(a.totalSpent||0)).slice(0,6);
+          return arr.length ? arr.map((u,i)=>`
+            <div class="activity-item">
+              <div class="ai-icon gold">#${i+1}</div>
+              <div class="ai-body"><div class="t">${u.name}</div><div class="s">${u.email}</div></div>
+              <div class="ai-time" style="color:var(--gold);font-size:13px;font-weight:800">${money(u.totalSpent||0)}</div>
+            </div>`).join('') : '<div class="empty"><p>No users</p></div>';
+        })()}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* === USERS === */
+let userFilter = 'all';
+function renderUsers(){
+  const db = NX.load();
+  let list = userFilter==='all' ? db.users : db.users.filter(u=>u.status===userFilter);
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head">
+      <div><h1><span class="ic">👥</span> User Management</h1><p>${db.users.length} total users • Full control</p></div>
+      <div class="page-actions"><button class="btn btn-gold" onclick="addUserModal()">+ Add User</button></div>
+    </div>
+    <div class="card">
+      <div class="chips">
+        ${['all','Active','Suspended','Banned'].map(f=>`<div class="chip ${f===userFilter?'active':''}" onclick="userFilter='${f}';renderUsers()">${f==='all'?'All':f} (${f==='all'?db.users.length:db.users.filter(u=>u.status===f).length})</div>`).join('')}
+      </div>
+      ${list.length?`<div class="tbl-wrap"><table>
+        <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Balance</th><th>Spent</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${list.map(u=>`
+          <tr>
+            <td class="mono" style="color:var(--gold);font-weight:700">${u.id}</td>
+            <td style="font-weight:700">${u.name}</td>
+            <td class="mono">${u.email}</td>
+            <td class="rate">${money(u.balance)}</td>
+            <td>${money(u.totalSpent||0)}</td>
+            <td>${badge(u.status)}</td>
+            <td style="white-space:nowrap">
+              <button class="btn btn-ghost btn-sm" onclick="viewUser('${u.id}')">👁️</button>
+              <button class="btn btn-ghost btn-sm" onclick="editUserModal('${u.id}')">✏️</button>
+              <button class="btn btn-ghost btn-sm" onclick="balanceModal('${u.id}')">💰</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteUserConfirm('${u.id}')">🗑️</button>
+            </td>
+          </tr>`).join('')}</tbody>
+      </table></div>`:`<div class="empty"><p>No users found</p></div>`}
+    </div>
+  </div>`;
+}
+function viewUser(id){
+  const db = NX.load();
+  const u = db.users.find(x=>x.id===id);
+  const userOrders = db.orders.filter(o=>o.userId===id);
+  const userDeposits = db.deposits.filter(d=>d.userId===id);
+  openModal(`👤 ${u.name}`, `
+    <div style="text-align:left;font-size:12.5px;line-height:1.9">
+      <div><b>ID:</b> <span class="mono">${u.id}</span></div>
+      <div><b>Email:</b> ${u.email}</div>
+      <div><b>Status:</b> ${badge(u.status)}</div>
+      <div><b>Balance:</b> <span class="rate">${money(u.balance)}</span></div>
+      <div><b>Total Spent:</b> ${money(u.totalSpent||0)}</div>
+      <div><b>Total Added:</b> ${money(u.totalAdded||0)}</div>
+      <div><b>Orders:</b> ${userOrders.length}</div>
+      <div><b>Deposits:</b> ${userDeposits.length}</div>
+      <div><b>Joined:</b> ${fmt(u.joined)}</div>
+      <div><b>Last Login:</b> ${fmt(u.last)}</div>
+      <div><b>IP:</b> ${u.ip}</div>
+    </div>`, null, 'Close');
+  $('modalConfirm').style.display='none';
+  setTimeout(()=>{ $('modalActions').innerHTML = '<button class="btn btn-gold" onclick="closeModal()">Close</button>'; }, 50);
+}
+function editUserModal(id){
+  const u = NX.load().users.find(x=>x.id===id);
+  $('modalTitle').textContent = 'Edit User';
+  $('modalText').innerHTML = `
+    <div class="fg" style="margin-bottom:10px"><label>Name</label><input type="text" id="euName" value="${u.name}"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Email</label><input type="email" id="euEmail" value="${u.email}"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Status</label>
+      <select id="euStatus"><option ${u.status==='Active'?'selected':''}>Active</option><option ${u.status==='Suspended'?'selected':''}>Suspended</option><option ${u.status==='Banned'?'selected':''}>Banned</option></select>
+    </div>
+    <div class="fg" style="margin-bottom:10px"><label>Reset Password (optional)</label><input type="text" id="euPass" placeholder="Leave empty to keep"/></div>`;
+  $('modalBg').classList.add('show');
+  modalCb = () => {
+    const name = $('euName').value.trim();
+    const email = $('euEmail').value.trim();
+    const status = $('euStatus').value;
+    const pass = $('euPass').value;
+    NX.updateUser(id, {name, email, status});
+    if (pass) NX.resetUserPassword(id, pass);
+    toast('User updated ✅','ok');
+    renderUsers();
+  };
+  $('modalConfirm').style.display='';
+  $('modalActions').innerHTML = '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" id="modalConfirm">Save Changes</button>';
+  $('modalConfirm').onclick = () => { if(modalCb) modalCb(); closeModal(); };
+}
+function balanceModal(id){
+  const u = NX.load().users.find(x=>x.id===id);
+  $('modalTitle').textContent = 'Adjust Balance';
+  $('modalText').innerHTML = `
+    <div style="margin-bottom:10px"><b>${u.name}</b> — Current: <span class="rate">${money(u.balance)}</span></div>
+    <div class="fg" style="margin-bottom:10px"><label>Amount (positive = add, negative = deduct)</label><input type="number" id="balAmt" placeholder="e.g. 500 or -500"/></div>
+    <div class="fg"><label>Reason</label><input type="text" id="balReason" placeholder="Reason for adjustment"/></div>`;
+  $('modalBg').classList.add('show');
+  modalCb = () => {
+    const amt = Number($('balAmt').value);
+    const reason = $('balReason').value.trim() || 'Admin adjustment';
+    if (!amt) return toast('Amount required','err');
+    NX.adjustBalance(id, amt, reason);
+    toast(`Balance ${amt>0?'added':'deducted'} ✅`,'ok');
+    renderUsers();
+  };
+  $('modalActions').innerHTML = '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" id="modalConfirm">Apply</button>';
+  $('modalConfirm').onclick = () => { if(modalCb) modalCb(); closeModal(); };
+}
+function addUserModal(){
+  $('modalTitle').textContent = 'Add New User';
+  $('modalText').innerHTML = `
+    <div class="fg" style="margin-bottom:10px"><label>Name</label><input type="text" id="nuName"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Email</label><input type="email" id="nuEmail"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Password</label><input type="text" id="nuPass" value="user123"/></div>
+    <div class="fg"><label>Initial Balance (₹)</label><input type="number" id="nuBal" value="0"/></div>`;
+  $('modalBg').classList.add('show');
+  modalCb = () => {
+    const name = $('nuName').value.trim();
+    const email = $('nuEmail').value.trim();
+    const pass = $('nuPass').value;
+    const bal = Number($('nuBal').value)||0;
+    if (!name || !email || pass.length<6) return toast('Fill all fields correctly','err');
+    const r = NX.register(name, email, pass);
+    if (!r.ok) return toast(r.msg,'err');
+    if (bal>0) NX.adjustBalance(r.user.id, bal, 'Initial admin credit');
+    toast('User created ✅','ok');
+    renderUsers();
+  };
+  $('modalActions').innerHTML = '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" id="modalConfirm">Create</button>';
+  $('modalConfirm').onclick = () => { if(modalCb) modalCb(); closeModal(); };
+}
+function deleteUserConfirm(id){
+  const u = NX.load().users.find(x=>x.id===id);
+  openModal('Delete User?', `Delete <b>${u.name}</b>? This cannot be undone.`, ()=>{
+    NX.deleteUser(id); toast('User deleted','ok'); renderUsers();
+  }, 'Delete');
+}
+
+/* === WALLET === */
+function renderWallet(){
+  const db = NX.load();
+  const txns = [];
+  db.deposits.forEach(d => txns.push({type:'Deposit',user:d.userName,amount:d.amount,status:d.status,date:d.date,id:d.id}));
+  db.withdrawals.forEach(w => txns.push({type:'Withdrawal',user:w.userName,amount:-w.amount,status:w.status,date:w.date,id:w.id}));
+  txns.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head"><div><h1><span class="ic">💰</span> Wallet & Balance</h1><p>All wallet transactions across users</p></div></div>
+    <div class="stats">
+      <div class="stat"><div class="ic">💰</div><div class="lbl">Total User Balance</div><div class="val" style="color:var(--gold)">${money(db.users.reduce((s,u)=>s+u.balance,0))}</div></div>
+      <div class="stat"><div class="ic">💳</div><div class="lbl">Total Deposited</div><div class="val" style="color:#4ade80">${money(db.deposits.filter(d=>d.status==='Approved').reduce((s,d)=>s+d.amount,0))}</div></div>
+      <div class="stat"><div class="ic">💸</div><div class="lbl">Total Withdrawn</div><div class="val" style="color:#f87171">${money(db.withdrawals.filter(w=>w.status==='Approved').reduce((s,w)=>s+w.amount,0))}</div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>📋 Wallet Transaction History</h2></div>
+      ${txns.length?`<div class="tbl-wrap"><table>
+        <thead><tr><th>Txn ID</th><th>Type</th><th>User</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>${txns.slice(0,50).map(t=>`
+          <tr>
+            <td class="mono" style="color:var(--gold)">${t.id}</td>
+            <td><span class="badge ${t.type==='Deposit'?'b-completed':'b-partial'}">${t.type}</span></td>
+            <td>${t.user}</td>
+            <td class="${t.amount>0?'rate':'rate-neg'}" style="${t.amount<0?'color:#f87171;font-weight:700':''}">${t.amount>0?'+':''}${money(Math.abs(t.amount))}</td>
+            <td>${badge(t.status)}</td>
+            <td class="mono">${fmt(t.date)}</td>
+          </tr>`).join('')}</tbody>
+      </table></div>`:`<div class="empty"><p>No transactions</p></div>`}
+    </div>
+  </div>`;
+}
+
+/* === DEPOSITS === */
+function renderDeposits(){
+  const db = NX.load();
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head"><div><h1><span class="ic">💳</span> Payments & Deposits</h1><p>Approve or reject user deposits</p></div></div>
+    <div class="stats">
+      <div class="stat"><div class="ic">⏳</div><div class="lbl">Pending</div><div class="val" style="color:#fbbf24">${db.deposits.filter(d=>d.status==='Pending').length}</div></div>
+      <div class="stat"><div class="ic">✅</div><div class="lbl">Approved</div><div class="val" style="color:#4ade80">${db.deposits.filter(d=>d.status==='Approved').length}</div></div>
+      <div class="stat"><div class="ic">❌</div><div class="lbl">Rejected</div><div class="val" style="color:#f87171">${db.deposits.filter(d=>d.status==='Rejected').length}</div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>📋 All Deposit Requests</h2></div>
+      ${db.deposits.length?`<div class="tbl-wrap"><table>
+        <thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Method</th><th>TXN</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>${db.deposits.map(d=>`
+          <tr>
+            <td class="mono" style="color:var(--gold)">${d.id}</td>
+            <td>${d.userName}</td>
+            <td class="rate">${money(d.amount)}</td>
+            <td>${d.method}</td>
+            <td class="mono">${d.txn}</td>
+            <td>${badge(d.status)}</td>
+            <td class="mono">${fmt(d.date)}</td>
+            <td>${d.status==='Pending'?`
+              <button class="btn btn-green btn-sm" onclick="approveDep('${d.id}')">✔ Approve</button>
+              <button class="btn btn-danger btn-sm" onclick="rejectDep('${d.id}')">✕</button>
+            `:'—'}</td>
+          </tr>`).join('')}</tbody>
+      </table></div>`:`<div class="empty"><p>No deposits</p></div>`}
+    </div>
+  </div>`;
+}
+function approveDep(id){ NX.approveDeposit(id); toast('Deposit approved ✅','ok'); renderDeposits(); }
+function rejectDep(id){
+  openModal('Reject Deposit?','Reason for rejection?',()=>{
+    NX.rejectDeposit(id,'Rejected by admin'); toast('Deposit rejected','info'); renderDeposits();
+  },'Reject');
+}
+
+/* === WITHDRAWALS === */
+function renderWithdrawals(){
+  const db = NX.load();
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head"><div><h1><span class="ic">💸</span> Withdrawal Requests</h1><p>Process user withdrawal requests</p></div></div>
+    <div class="card">
+      <div class="card-head"><h2>📋 All Requests</h2></div>
+      ${db.withdrawals.length?`<div class="tbl-wrap"><table>
+        <thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>${db.withdrawals.map(w=>`
+          <tr>
+            <td class="mono" style="color:var(--gold)">${w.id}</td>
+            <td>${w.userName}</td>
+            <td class="rate">${money(w.amount)}</td>
+            <td>${w.method}</td>
+            <td>${badge(w.status)}</td>
+            <td class="mono">${fmt(w.date)}</td>
+            <td>${w.status==='Pending'?`
+              <button class="btn btn-green btn-sm" onclick="approveWdr('${w.id}')">✔</button>
+              <button class="btn btn-danger btn-sm" onclick="rejectWdr('${w.id}')">✕</button>
+            `:'—'}</td>
+          </tr>`).join('')}</tbody>
+      </table></div>`:`<div class="empty"><p>No withdrawal requests</p></div>`}
+    </div>
+  </div>`;
+}
+function approveWdr(id){ NX.approveWithdrawal(id); toast('Withdrawal approved','ok'); renderWithdrawals(); }
+function rejectWdr(id){
+  openModal('Reject Withdrawal?','Amount will be refunded to user balance.',()=>{
+    NX.rejectWithdrawal(id,'Rejected by admin'); toast('Rejected & refunded','info'); renderWithdrawals();
+  },'Reject');
+}
+
+/* === SERVICES === */
+function renderServices(){
+  const db = NX.load();
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head">
+      <div><h1><span class="ic">📦</span> Service Management</h1><p>${db.services.length} services • Full CRUD</p></div>
+      <div class="page-actions"><button class="btn btn-gold" onclick="addServiceModal()">+ Add Service</button></div>
+    </div>
+    <div class="card">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>ID</th><th>Service</th><th>Category</th><th>Rate</th><th>Cost</th><th>Profit</th><th>Min/Max</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${db.services.map(s=>`
+          <tr>
+            <td class="mono">#${s.id}</td>
+            <td style="font-weight:700;max-width:230px">${s.name}</td>
+            <td><span class="badge b-gold">${s.cat}</span></td>
+            <td class="rate">${money(s.rate)}</td>
+            <td class="mono">${money(s.cost)}</td>
+            <td class="rate">${money(s.rate-s.cost)}</td>
+            <td class="mono">${s.min.toLocaleString()}/${s.max.toLocaleString()}</td>
+            <td>${s.status==='Active'?'<span class="badge b-active">Active</span>':'<span class="badge b-failed">Inactive</span>'}</td>
+            <td style="white-space:nowrap">
+              <button class="btn btn-ghost btn-sm" onclick="editServiceModal(${s.id})">✏️</button>
+              <button class="btn btn-ghost btn-sm" onclick="toggleService(${s.id})">${s.status==='Active'?'🔒':'🔓'}</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteServiceConfirm(${s.id})">🗑️</button>
+            </td>
+          </tr>`).join('')}</tbody>
+      </table></div>
+    </div>
+  </div>`;
+}
+function addServiceModal(){
+  const db = NX.load();
+  const cats = [...new Set(db.services.map(s=>s.cat))];
+  $('modalTitle').textContent = 'Add Service';
+  $('modalText').innerHTML = `
+    <div class="fg" style="margin-bottom:10px"><label>Service Name</label><input type="text" id="svName"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Category</label><select id="svCat">${cats.map(c=>`<option>${c}</option>`).join('')}<option value="__new">➕ Add New Category</option></select></div>
+    <div class="fg" style="margin-bottom:10px"><label>New Category (if adding)</label><input type="text" id="svNewCat" placeholder="Leave empty to skip"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Rate per 1000 (₹)</label><input type="number" id="svRate" value="50"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Cost per 1000 (₹)</label><input type="number" id="svCost" value="30"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Min Order</label><input type="number" id="svMin" value="100"/></div>
+    <div class="fg"><label>Max Order</label><input type="number" id="svMax" value="100000"/></div>`;
+  $('modalBg').classList.add('show');
+  modalCb = () => {
+    let cat = $('svCat').value;
+    const newCat = $('svNewCat').value.trim();
+    if (cat==='__new' && newCat) cat = newCat;
+    else if (cat==='__new') return toast('Enter new category name','err');
+    const name = $('svName').value.trim();
+    if (!name) return toast('Name required','err');
+    NX.addService({name, cat, rate:Number($('svRate').value), cost:Number($('svCost').value), min:Number($('svMin').value), max:Number($('svMax').value), speed:'1-2h', refill:false});
+    toast('Service added ✅','ok'); renderServices();
+  };
+  $('modalActions').innerHTML = '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" id="modalConfirm">Add</button>';
+  $('modalConfirm').onclick = () => { if(modalCb) modalCb(); closeModal(); };
+}
+function editServiceModal(id){
+  const s = NX.load().services.find(x=>x.id===id);
+  $('modalTitle').textContent = 'Edit Service';
+  $('modalText').innerHTML = `
+    <div class="fg" style="margin-bottom:10px"><label>Name</label><input type="text" id="esName" value="${s.name}"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Rate</label><input type="number" id="esRate" value="${s.rate}"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Cost</label><input type="number" id="esCost" value="${s.cost}"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Min</label><input type="number" id="esMin" value="${s.min}"/></div>
+    <div class="fg"><label>Max</label><input type="number" id="esMax" value="${s.max}"/></div>`;
+  $('modalBg').classList.add('show');
+  modalCb = () => {
+    NX.updateService(id, {name:$('esName').value.trim(), rate:Number($('esRate').value), cost:Number($('esCost').value), min:Number($('esMin').value), max:Number($('esMax').value)});
+    toast('Service updated ✅','ok'); renderServices();
+  };
+  $('modalActions').innerHTML = '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" id="modalConfirm">Save</button>';
+  $('modalConfirm').onclick = () => { if(modalCb) modalCb(); closeModal(); };
+}
+function toggleService(id){
+  const s = NX.load().services.find(x=>x.id===id);
+  NX.updateService(id, {status: s.status==='Active'?'Inactive':'Active'});
+  toast('Service toggled','ok'); renderServices();
+}
+function deleteServiceConfirm(id){
+  openModal('Delete Service?','This action cannot be undone.',()=>{ NX.deleteService(id); toast('Deleted','ok'); renderServices(); },'Delete');
+}
+
+/* === CATEGORIES === */
+function renderCategories(){
+  const db = NX.load();
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head">
+      <div><h1><span class="ic">📂</span> Category Management</h1><p>${db.categories.length} categories</p></div>
+      <div class="page-actions"><button class="btn btn-gold" onclick="addCatModal()">+ Add Category</button></div>
+    </div>
+    <div class="card">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>ID</th><th>Name</th><th>Services</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${db.categories.map(c=>{
+          const svcCount = db.services.filter(s=>s.cat===c.name).length;
+          return `<tr>
+            <td class="mono">#${c.id}</td>
+            <td style="font-weight:700">${c.name}</td>
+            <td>${svcCount}</td>
+            <td>${badge(c.status)}</td>
+            <td>
+              <button class="btn btn-ghost btn-sm" onclick="editCatModal(${c.id})">✏️</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteCatConfirm(${c.id})">🗑️</button>
+            </td>
+          </tr>`;}).join('')}</tbody>
+      </table></div>
+    </div>
+  </div>`;
+}
+function addCatModal(){
+  $('modalTitle').textContent = 'Add Category';
+  $('modalText').innerHTML = `<div class="fg"><label>Category Name</label><input type="text" id="catName"/></div>`;
+  $('modalBg').classList.add('show');
+  modalCb = () => {
+    const n = $('catName').value.trim();
+    if (!n) return toast('Name required','err');
+    NX.addCategory(n);
+    toast('Category added ✅','ok'); renderCategories();
+  };
+  $('modalActions').innerHTML = '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" id="modalConfirm">Add</button>';
+  $('modalConfirm').onclick = () => { if(modalCb) modalCb(); closeModal(); };
+}
+function editCatModal(id){
+  const c = NX.load().categories.find(x=>x.id===id);
+  $('modalTitle').textContent = 'Edit Category';
+  $('modalText').innerHTML = `<div class="fg"><label>Name</label><input type="text" id="catName" value="${c.name}"/></div>`;
+  $('modalBg').classList.add('show');
+  modalCb = () => {
+    NX.updateCategory(id, {name:$('catName').value.trim()});
+    toast('Updated ✅','ok'); renderCategories();
+  };
+  $('modalActions').innerHTML = '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" id="modalConfirm">Save</button>';
+  $('modalConfirm').onclick = () => { if(modalCb) modalCb(); closeModal(); };
+}
+function deleteCatConfirm(id){
+  openModal('Delete Category?','Services in this category will not be deleted.',()=>{ NX.deleteCategory(id); toast('Deleted','ok'); renderCategories(); },'Delete');
+}
+
+/* === ORDERS === */
+let orderFilter = 'all';
+function renderOrders(){
+  const db = NX.load();
+  let list = orderFilter==='all' ? db.orders : db.orders.filter(o=>o.status===orderFilter);
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head">
+      <div><h1><span class="ic">📦</span> Order Management</h1><p>${db.orders.length} total orders • Full control</p></div>
+    </div>
+    <div class="card">
+      <div class="chips">
+        ${['all','Pending','In Progress','Completed','Partial','Cancelled','Failed'].map(f=>`<div class="chip ${f===orderFilter?'active':''}" onclick="orderFilter='${f}';renderOrders()">${f==='all'?'All':f}</div>`).join('')}
+      </div>
+      ${list.length?`<div class="tbl-wrap"><table>
+        <thead><tr><th>ID</th><th>User</th><th>Service</th><th>Qty</th><th>Charge</th><th>Cost</th><th>Profit</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${list.map(o=>`
+          <tr>
+            <td class="mono" style="color:var(--gold)">${o.id}</td>
+            <td>${o.userName}</td>
+            <td style="max-width:200px">${o.service}</td>
+            <td>${o.qty.toLocaleString()}</td>
+            <td class="rate">${money(o.charge)}</td>
+            <td class="mono">${money(o.cost)}</td>
+            <td class="rate">${money(o.profit)}</td>
+            <td>${badge(o.status)}</td>
+            <td style="white-space:nowrap">
+              <button class="btn btn-ghost btn-sm" onclick="viewOrder('${o.id}')">👁️</button>
+              <button class="btn btn-ghost btn-sm" onclick="editOrderStatus('${o.id}')">✏️</button>
+              <button class="btn btn-danger btn-sm" onclick="refundOrderConfirm('${o.id}')">💸</button>
+            </td>
+          </tr>`).join('')}</tbody>
+      </table></div>`:`<div class="empty"><p>No orders</p></div>`}
+    </div>
+  </div>`;
+}
+function viewOrder(id){
+  const o = NX.load().orders.find(x=>x.id===id);
+  $('modalTitle').textContent = `Order ${o.id}`;
+  $('modalText').innerHTML = `
+    <div style="text-align:left;font-size:12.5px;line-height:1.9">
+      <div><b>User:</b> ${o.userName}</div>
+      <div><b>Service:</b> ${o.service}</div>
+      <div><b>Link:</b> <a href="https://${o.link}" target="_blank" style="color:var(--gold)">${o.link}</a></div>
+      <div><b>Quantity:</b> ${o.qty.toLocaleString()}</div>
+      <div><b>Charge:</b> <span class="rate">${money(o.charge)}</span></div>
+      <div><b>Cost:</b> ${money(o.cost)}</div>
+      <div><b>Profit:</b> <span class="rate">${money(o.profit)}</span></div>
+      <div><b>Status:</b> ${badge(o.status)}</div>
+      <div><b>Date:</b> ${fmt(o.date)}</div>
+    </div>`;
+  $('modalBg').classList.add('show');
+  modalCb = null;
+  $('modalActions').innerHTML = '<button class="btn btn-gold" onclick="closeModal()">Close</button>';
+}
+function editOrderStatus(id){
+  const o = NX.load().orders.find(x=>x.id===id);
+  $('modalTitle').textContent = 'Change Order Status';
+  $('modalText').innerHTML = `
+    <div class="fg"><label>New Status</label>
+      <select id="ordStatus">
+        ${['Pending','In Progress','Completed','Partial','Cancelled','Failed'].map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>`;
+  $('modalBg').classList.add('show');
+  modalCb = () => {
+    NX.updateOrder(id, {status:$('ordStatus').value});
+    NX.addLog('Order status changed', `${o.id} → ${$('ordStatus').value}`, 'blue');
+    toast('Status updated ✅','ok'); renderOrders();
+  };
+  $('modalActions').innerHTML = '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" id="modalConfirm">Update</button>';
+  $('modalConfirm').onclick = () => { if(modalCb) modalCb(); closeModal(); };
+}
+function refundOrderConfirm(id){
+  const o = NX.load().orders.find(x=>x.id===id);
+  openModal('Refund Order?', `Refund <b>${money(o.charge)}</b> to ${o.userName}?`, ()=>{
+    NX.refundOrder(id, 'Refund by admin');
+    toast('Order refunded ✅','ok'); renderOrders();
+  }, 'Refund');
+}
+
+/* === PROVIDERS === */
+function renderProviders(){
+  const db = NX.load();
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head">
+      <div><h1><span class="ic">🔌</span> Provider API Management</h1><p>${db.providers.length} providers connected</p></div>
+      <div class="page-actions"><button class="btn btn-gold" onclick="addProviderModal()">+ Add Provider</button></div>
+    </div>
+    <div class="grid-2">
+      ${db.providers.map(p=>`
+        <div class="card">
+          <div class="card-head">
+            <div><h2>🔌 ${p.name}</h2><p class="mono" style="font-size:11px">${p.url}</p></div>
+            ${p.status==='Active'?'<span class="badge b-active">Active</span>':'<span class="badge b-pending">Low Balance</span>'}
+          </div>
+          <div class="grid-3" style="margin-bottom:14px">
+            <div><div style="font-size:10.5px;color:var(--muted);font-weight:700">BALANCE</div><div style="font-size:17px;font-weight:800;color:${p.balance<5000?'#f87171':'var(--gold)'}">${money(p.balance)}</div></div>
+            <div><div style="font-size:10.5px;color:var(--muted);font-weight:700">ORDERS</div><div style="font-size:17px;font-weight:800">${p.orders}</div></div>
+            <div><div style="font-size:10.5px;color:var(--muted);font-weight:700">PRIORITY</div><div style="font-size:17px;font-weight:800">${p.priority||1}</div></div>
+          </div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="testProvider('${p.id}')">⚡ Test</button>
+            <button class="btn btn-ghost btn-sm" onclick="editProviderModal('${p.id}')">✏️ Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProviderConfirm('${p.id}')">🗑️</button>
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+function testProvider(id){ toast('Testing API connection...','info'); setTimeout(()=>toast('Connection successful ✅','ok'),800); }
+function addProviderModal(){
+  $('modalTitle').textContent = 'Add Provider';
+  $('modalText').innerHTML = `
+    <div class="fg" style="margin-bottom:10px"><label>Name</label><input type="text" id="pvName"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>API URL</label><input type="text" id="pvUrl" placeholder="https://api.provider.com/v2"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>API Key</label><input type="text" id="pvKey"/></div>
+    <div class="fg"><label>Initial Balance</label><input type="number" id="pvBal" value="0"/></div>`;
+  $('modalBg').classList.add('show');
+  modalCb = () => {
+    const n = $('pvName').value.trim();
+    if (!n) return toast('Name required','err');
+    NX.addProvider({name:n, url:$('pvUrl').value.trim(), apiKey:$('pvKey').value, balance:Number($('pvBal').value)||0, priority:1});
+    toast('Provider added ✅','ok'); renderProviders();
+  };
+  $('modalActions').innerHTML = '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" id="modalConfirm">Add</button>';
+  $('modalConfirm').onclick = () => { if(modalCb) modalCb(); closeModal(); };
+}
+function editProviderModal(id){
+  const p = NX.load().providers.find(x=>x.id===id);
+  $('modalTitle').textContent = 'Edit Provider';
+  $('modalText').innerHTML = `
+    <div class="fg" style="margin-bottom:10px"><label>Name</label><input type="text" id="pvName" value="${p.name}"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>API URL</label><input type="text" id="pvUrl" value="${p.url}"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Balance</label><input type="number" id="pvBal" value="${p.balance}"/></div>
+    <div class="fg"><label>Status</label><select id="pvStatus"><option ${p.status==='Active'?'selected':''}>Active</option><option ${p.status==='Low Balance'?'selected':''}>Low Balance</option></select></div>`;
+  $('modalBg').classList.add('show');
+  modalCb = () => {
+    NX.updateProvider(id, {name:$('pvName').value.trim(), url:$('pvUrl').value.trim(), balance:Number($('pvBal').value), status:$('pvStatus').value});
+    toast('Updated ✅','ok'); renderProviders();
+  };
+  $('modalActions').innerHTML = '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" id="modalConfirm">Save</button>';
+  $('modalConfirm').onclick = () => { if(modalCb) modalCb(); closeModal(); };
+}
+function deleteProviderConfirm(id){
+  openModal('Delete Provider?','',()=>{ NX.deleteProvider(id); toast('Deleted','ok'); renderProviders(); },'Delete');
+}
+
+/* === TICKETS === */
+function renderTickets(){
+  const db = NX.load();
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head"><div><h1><span class="ic">💬</span> Support Tickets</h1><p>${db.tickets.length} tickets</p></div></div>
+    <div class="card">
+      ${db.tickets.length?`<div class="tbl-wrap"><table>
+        <thead><tr><th>ID</th><th>User</th><th>Subject</th><th>Priority</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>${db.tickets.map(t=>`
+          <tr>
+            <td class="mono" style="color:var(--gold)">${t.id}</td>
+            <td>${t.userName}</td>
+            <td>${t.subject}</td>
+            <td>${t.priority}</td>
+            <td>${badge(t.status)}</td>
+            <td class="mono">${fmt(t.date)}</td>
+            <td><button class="btn btn-ghost btn-sm" onclick="openTicket('${t.id}')">💬 Open</button></td>
+          </tr>`).join('')}</tbody>
+      </table></div>`:`<div class="empty"><p>No tickets</p></div>`}
+    </div>
+  </div>`;
+}
+function openTicket(id){
+  const t = NX.load().tickets.find(x=>x.id===id);
+  $('modalTitle').textContent = `Ticket ${t.id}`;
+  $('modalText').innerHTML = `
+    <div style="text-align:left;font-size:12.5px;margin-bottom:12px">
+      <div><b>User:</b> ${t.userName}</div>
+      <div><b>Subject:</b> ${t.subject}</div>
+      <div><b>Priority:</b> ${t.priority}</div>
+      <div><b>Status:</b> ${badge(t.status)}</div>
+    </div>
+    <div style="max-height:200px;overflow-y:auto;padding:12px;background:rgba(6,7,12,.5);border-radius:10px;margin-bottom:12px">
+      ${t.messages.map(m=>`
+        <div style="margin-bottom:10px;padding:9px 12px;background:${m.from==='admin'?'rgba(245,183,76,.1)':'rgba(139,92,246,.08)'};border-radius:8px;font-size:12.5px">
+          <div style="font-size:10.5px;color:var(--muted);font-weight:700;margin-bottom:4px">${m.from==='admin'?'ADMIN':'USER'} • ${fmt(m.time)}</div>
+          ${m.text}
+        </div>`).join('')}
+    </div>
+    <div class="fg"><label>Reply</label><textarea id="tktReply" placeholder="Type your reply..."></textarea></div>`;
+  $('modalBg').classList.add('show');
+  $('modalActions').innerHTML = `
+    <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+    <button class="btn btn-ghost" onclick="NX.closeTicket('${id}');toast('Ticket closed','info');closeModal();renderTickets();">Close Ticket</button>
+    <button class="btn btn-gold" id="modalReply">Send Reply</button>`;
+  $('modalReply').onclick = () => {
+    const txt = $('tktReply').value.trim();
+    if (!txt) return toast('Enter reply','err');
+    NX.replyTicket(id, txt, 'admin');
+    toast('Reply sent ✅','ok');
+    closeModal(); renderTickets();
+  };
+}
+
+/* === NOTIFICATIONS === */
+function renderNotifications(){
+  const db = NX.load();
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head">
+      <div><h1><span class="ic">📢</span> Notifications & Announcements</h1><p>Broadcast messages to users</p></div>
+      <div class="page-actions"><button class="btn btn-gold" onclick="addNotifModal()">+ New Announcement</button></div>
+    </div>
+    <div class="card">
+      ${db.notifications.length?`<div class="activity-list">
+        ${db.notifications.map(n=>`
+          <div class="activity-item">
+            <div class="ai-icon gold">📢</div>
+            <div class="ai-body"><div class="t"><b>${n.title}</b></div><div class="s">${n.message}</div></div>
+            <div class="ai-time">${fmt(n.date)}</div>
+            <button class="btn btn-danger btn-sm" onclick="deleteNotif('${n.id}')">🗑️</button>
+          </div>`).join('')}
+      </div>`:`<div class="empty"><p>No announcements</p></div>`}
+    </div>
+  </div>`;
+}
+function addNotifModal(){
+  $('modalTitle').textContent = 'New Announcement';
+  $('modalText').innerHTML = `
+    <div class="fg" style="margin-bottom:10px"><label>Title</label><input type="text" id="ntTitle"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Message</label><textarea id="ntMsg"></textarea></div>
+    <div class="fg"><label>Type</label><select id="ntType"><option>info</option><option>promo</option><option>warning</option></select></div>`;
+  $('modalBg').classList.add('show');
+  modalCb = () => {
+    const t = $('ntTitle').value.trim();
+    const m = $('ntMsg').value.trim();
+    if (!t || !m) return toast('Fill all','err');
+    NX.addNotification(t, m, $('ntType').value);
+    toast('Announcement posted ✅','ok'); renderNotifications();
+  };
+  $('modalActions').innerHTML = '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" id="modalConfirm">Post</button>';
+  $('modalConfirm').onclick = () => { if(modalCb) modalCb(); closeModal(); };
+}
+function deleteNotif(id){ NX.deleteNotification(id); toast('Deleted','ok'); renderNotifications(); }
+
+/* === COUPONS === */
+function renderCoupons(){
+  const db = NX.load();
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head">
+      <div><h1><span class="ic">🎟️</span> Coupons & Promotions</h1><p>${db.coupons.length} coupons</p></div>
+      <div class="page-actions"><button class="btn btn-gold" onclick="addCouponModal()">+ Create Coupon</button></div>
+    </div>
+    <div class="card">
+      ${db.coupons.length?`<div class="tbl-wrap"><table>
+        <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Used</th><th>Limit</th><th>Expiry</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${db.coupons.map(c=>`
+          <tr>
+            <td class="mono" style="color:var(--gold);font-weight:800;font-size:13px">${c.code}</td>
+            <td><span class="badge b-gold">${c.type}</span></td>
+            <td class="rate">${c.type==='Percent'?c.value+'%':money(c.value)}</td>
+            <td>${c.used}</td>
+            <td>${c.limit}</td>
+            <td class="mono">${c.expiry}</td>
+            <td>${badge(c.status)}</td>
+            <td><button class="btn btn-danger btn-sm" onclick="deleteCouponConfirm('${c.code}')">🗑️</button></td>
+          </tr>`).join('')}</tbody>
+      </table></div>`:`<div class="empty"><p>No coupons</p></div>`}
+    </div>
+  </div>`;
+}
+function addCouponModal(){
+  $('modalTitle').textContent = 'Create Coupon';
+  $('modalText').innerHTML = `
+    <div class="fg" style="margin-bottom:10px"><label>Coupon Code</label><input type="text" id="cpCode" placeholder="e.g. WELCOME10"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Type</label><select id="cpType"><option>Percent</option><option>Fixed</option></select></div>
+    <div class="fg" style="margin-bottom:10px"><label>Value</label><input type="number" id="cpVal" value="10"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Usage Limit</label><input type="number" id="cpLimit" value="100"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Expiry Date</label><input type="date" id="cpExp" value="2025-12-31"/></div>
+    <div class="fg"><label>Min Deposit (₹)</label><input type="number" id="cpMin" value="100"/></div>`;
+  $('modalBg').classList.add('show');
+  modalCb = () => {
+    const code = $('cpCode').value.trim().toUpperCase();
+    if (!code) return toast('Code required','err');
+    const r = NX.addCoupon({code, type:$('cpType').value, value:Number($('cpVal').value), limit:Number($('cpLimit').value), expiry:$('cpExp').value, minDeposit:Number($('cpMin').value)});
+    if (!r.ok) return toast(r.msg,'err');
+    toast('Coupon created ✅','ok'); renderCoupons();
+  };
+  $('modalActions').innerHTML = '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" id="modalConfirm">Create</button>';
+  $('modalConfirm').onclick = () => { if(modalCb) modalCb(); closeModal(); };
+}
+function deleteCouponConfirm(code){
+  openModal('Delete Coupon?',`Delete <b>${code}</b>?`,()=>{ NX.deleteCoupon(code); toast('Deleted','ok'); renderCoupons(); },'Delete');
+}
+
+/* === SETTINGS === */
+function renderSettings(){
+  const s = NX.load().settings;
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head"><div><h1><span class="ic">⚙️</span> Website Settings</h1><p>Site configuration & policies</p></div>
+      <div class="page-actions"><button class="btn btn-gold" onclick="saveSettings()">💾 Save Settings</button></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><h2>🌐 General</h2></div>
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="fg"><label>Site Name</label><input type="text" id="stSiteName" value="${s.siteName}"/></div>
+          <div class="fg"><label>Tagline</label><input type="text" id="stTagline" value="${s.tagline}"/></div>
+          <div class="fg"><label>Contact Email</label><input type="email" id="stContact" value="${s.contactEmail}"/></div>
+          <div class="fg"><label>Currency Symbol</label><input type="text" id="stCurrency" value="${s.currency}"/></div>
+          <div class="fg"><label>Timezone</label><input type="text" id="stTz" value="${s.timezone}"/></div>
+          <div class="fg"><label>UPI ID</label><input type="text" id="stUpi" value="${s.upiId||''}"/></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>💰 Finance</h2></div>
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="fg"><label>Welcome Bonus (₹)</label><input type="number" id="stBonus" value="${s.welcomeBonus}"/></div>
+          <div class="fg"><label>Min Deposit (₹)</label><input type="number" id="stMinDep" value="${s.minDeposit}"/></div>
+          <div class="fg"><label>Max Deposit (₹)</label><input type="number" id="stMaxDep" value="${s.maxDeposit}"/></div>
+          <div class="fg"><label>Min Withdrawal (₹)</label><input type="number" id="stMinWdr" value="${s.minWithdrawal}"/></div>
+          <div class="fg"><label>Withdrawal Fee (%)</label><input type="number" id="stWdrFee" value="${s.withdrawalFee}"/></div>
+          <div class="fg"><label>Referral Commission (%)</label><input type="number" id="stRef" value="${s.referralCommission}"/></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>🔒 Maintenance & Access</h2></div>
+        <div class="setting-row">
+          <div><h4>Maintenance Mode</h4><p>Site ko temporarily band karein</p></div>
+          <label class="toggle"><input type="checkbox" id="stMaint" ${s.maintenance?'checked':''}/><span class="track"></span></label>
+        </div>
+        <div class="setting-row">
+          <div><h4>User Registration</h4><p>New users registration allow karein</p></div>
+          <label class="toggle"><input type="checkbox" id="stReg" ${s.registration?'checked':''}/><span class="track"></span></label>
+        </div>
+        <div class="setting-row">
+          <div><h4>Email Verification</h4><p>Signup pe email verify</p></div>
+          <label class="toggle"><input type="checkbox" id="stEmailV" ${s.emailVerification?'checked':''}/><span class="track"></span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>🎨 Branding</h2></div>
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="fg"><label>Primary Color</label><input type="color" id="stPrimary" value="${s.primaryColor}"/></div>
+          <div class="fg"><label>Secondary Color</label><input type="color" id="stSecondary" value="${s.secondaryColor}"/></div>
+          <div class="fg full"><label>Maintenance Message</label><textarea id="stMaintMsg">${s.maintenanceMsg}</textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+function saveSettings(){
+  NX.updateSettings({
+    siteName: $('stSiteName').value,
+    tagline: $('stTagline').value,
+    contactEmail: $('stContact').value,
+    currency: $('stCurrency').value,
+    timezone: $('stTz').value,
+    upiId: $('stUpi').value,
+    welcomeBonus: Number($('stBonus').value),
+    minDeposit: Number($('stMinDep').value),
+    maxDeposit: Number($('stMaxDep').value),
+    minWithdrawal: Number($('stMinWdr').value),
+    withdrawalFee: Number($('stWdrFee').value),
+    referralCommission: Number($('stRef').value),
+    maintenance: $('stMaint').checked,
+    registration: $('stReg').checked,
+    emailVerification: $('stEmailV').checked,
+    primaryColor: $('stPrimary').value,
+    secondaryColor: $('stSecondary').value,
+    maintenanceMsg: $('stMaintMsg').value
+  });
+  toast('Settings saved ✅','ok');
+}
+
+/* === STAFF === */
+function renderStaff(){
+  const db = NX.load();
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head">
+      <div><h1><span class="ic">🛡️</span> Admin & Staff</h1><p>${db.staff.length} staff members</p></div>
+      <div class="page-actions"><button class="btn btn-gold" onclick="addStaffModal()">+ Add Staff</button></div>
+    </div>
+    <div class="card">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${db.staff.map(s=>`
+          <tr>
+            <td class="mono">${s.id}</td>
+            <td style="font-weight:700">${s.name}</td>
+            <td class="mono">${s.email}</td>
+            <td><span class="badge b-gold">${s.role}</span></td>
+            <td>${badge(s.status)}</td>
+            <td>${s.email===NX.ADMIN_EMAIL?'<span style="font-size:11px;color:var(--muted)">Super Admin (locked)</span>':`<button class="btn btn-danger btn-sm" onclick="deleteStaffConfirm('${s.id}')">🗑️</button>`}</td>
+          </tr>`).join('')}</tbody>
+      </table></div>
+    </div>
+  </div>`;
+}
+function addStaffModal(){
+  $('modalTitle').textContent = 'Add Staff';
+  $('modalText').innerHTML = `
+    <div class="fg" style="margin-bottom:10px"><label>Name</label><input type="text" id="stfName"/></div>
+    <div class="fg" style="margin-bottom:10px"><label>Email</label><input type="email" id="stfEmail"/></div>
+    <div class="fg"><label>Role</label>
+      <select id="stfRole">
+        <option>Order Manager</option><option>Finance Manager</option>
+        <option>Support Manager</option><option>Service Manager</option><option>Read-Only</option>
+      </select>
+    </div>`;
+  $('modalBg').classList.add('show');
+  modalCb = () => {
+    const n = $('stfName').value.trim();
+    const e = $('stfEmail').value.trim();
+    if (!n || !e) return toast('Fill all fields','err');
+    NX.addStaff(n, e, $('stfRole').value);
+    toast('Staff added ✅','ok'); renderStaff();
+  };
+  $('modalActions').innerHTML = '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" id="modalConfirm">Add</button>';
+  $('modalConfirm').onclick = () => { if(modalCb) modalCb(); closeModal(); };
+}
+function deleteStaffConfirm(id){
+  openModal('Delete Staff?','',()=>{ NX.deleteStaff(id); toast('Deleted','ok'); renderStaff(); },'Delete');
+}
+
+/* === LOGS === */
+function renderLogs(){
+  const db = NX.load();
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head">
+      <div><h1><span class="ic">📜</span> Logs & Monitoring</h1><p>${db.logs.length} log entries</p></div>
+      <div class="page-actions"><button class="btn btn-ghost" onclick="renderLogs();toast('Refreshed','ok')">🔄 Refresh</button></div>
+    </div>
+    <div class="card">
+      <div class="activity-list" style="max-height:600px">
+        ${db.logs.length?db.logs.map(l=>`
+          <div class="activity-item">
+            <div class="ai-icon ${l.type}">${typeIcon(l.type)}</div>
+            <div class="ai-body"><div class="t">${l.action}</div><div class="s">${l.detail}</div></div>
+            <div class="ai-time">${fmt(l.time)}</div>
+          </div>`).join(''):`<div class="empty"><p>No logs</p></div>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* === DATABASE === */
+function renderDatabase(){
+  const db = NX.load();
+  const sizeKB = (JSON.stringify(db).length/1024).toFixed(1);
+  $('content').innerHTML = `
+  <div class="page active">
+    <div class="page-head"><div><h1><span class="ic">🗄️</span> Database & Backup</h1><p>Manage data, export/import backups</p></div></div>
+    <div class="stats">
+      <div class="stat"><div class="ic">💾</div><div class="lbl">Database Size</div><div class="val">${sizeKB} KB</div></div>
+      <div class="stat"><div class="ic">👥</div><div class="lbl">Users</div><div class="val">${db.users.length}</div></div>
+      <div class="stat"><div class="ic">📦</div><div class="lbl">Orders</div><div class="val">${db.orders.length}</div></div>
+      <div class="stat"><div class="ic">⚙️</div><div class="lbl">Services</div><div class="val">${db.services.length}</div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>🛠️ Data Operations</h2></div>
+      <div class="setting-row">
+        <div><h4>Export Backup</h4><p>Download complete database as JSON file</p></div>
+        <button class="btn btn-gold" onclick="NX.exportBackup();toast('Backup downloaded ✅','ok')">⬇️ Download</button>
+      </div>
+      <div class="setting-row">
+        <div><h4>Import Backup</h4><p>Restore data from JSON backup file</p></div>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)"/>
+        <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()">⬆️ Import</button>
+      </div>
+      <div class="setting-row">
+        <div><h4>Reset Database</h4><p style="color:#f87171">All data will be lost and reset to defaults</p></div>
+        <button class="btn btn-danger" onclick="resetDbConfirm()">🔄 Reset</button>
+      </div>
+    </div>
+  </div>`;
+}
+function handleImport(e){
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    if (NX.importBackup(ev.target.result)){ toast('Backup restored ✅','ok'); renderDatabase(); }
+    else toast('Invalid backup file','err');
+  };
+  r.readAsText(f);
+}
+function resetDbConfirm(){
+  openModal('Reset Database?','⚠️ ALL users, orders, services will be deleted and reset to demo data. This cannot be undone.',()=>{
+    NX.resetDatabase(); toast('Database reset','info'); renderDatabase();
+  }, 'Yes, Reset Everything');
+}
+
+/* === BOOT === */
+function boot(){
+  renderSidebar();
+  go('dashboard');
+  // Auto refresh sidebar badges every 5s
+  setInterval(()=>{ if(NX.isAdmin()) renderSidebar(); }, 5000);
+}
+if (NX.isAdmin()){
+  $('loginScreen').classList.add('hidden');
+  $('app').classList.remove('hidden');
+  boot();
+}
+</script>
+</body>
+</html>
